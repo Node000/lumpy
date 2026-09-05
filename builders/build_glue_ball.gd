@@ -12,13 +12,13 @@ func _initialize() -> void:
 
 	var blob := BlobSprite.new()
 	blob.name = "GlueBody"
-	blob.base_radius = 8.5
+	blob.base_radius = 6.0
 	visual.add_child(blob)
 
 	var collision := CollisionShape2D.new()
 	collision.name = "Collision"
 	var shape := CircleShape2D.new()
-	shape.radius = 8.5
+	shape.radius = 6.0
 	collision.shape = shape
 	root.add_child(collision)
 

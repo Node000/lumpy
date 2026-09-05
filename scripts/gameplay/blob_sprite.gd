@@ -5,10 +5,10 @@ extends Node2D
 ## metaball canvas.
 
 var color := Color(1, 1, 1, 1)
-var base_radius := 8.5
+var base_radius := 6.0
 var target_scale := 1.0
-var ring_pulse := false
 var wobble := 0.07
+var motion_active := true
 var _scale := 1.0
 var _time := 0.0
 var _velocity := Vector2.ZERO
@@ -36,27 +36,23 @@ func _ready() -> void:
 	_material.shader = load("res://shaders/liquid_blob.gdshader")
 	_sprite.material = _material
 	add_child(_sprite)
-	_material.set_shader_parameter("time", _time)
-	_material.set_shader_parameter("flow_speed", _tuning_float("glue_visual_flow_speed", 1.35))
-	_material.set_shader_parameter("distortion", _tuning_float("glue_visual_distortion", 0.075))
+	# Static surface: no time-driven wobble/flow animation on the ball.
+	_material.set_shader_parameter("time", 0.0)
+	_material.set_shader_parameter("flow_speed", 0.0)
+	_material.set_shader_parameter("distortion", 0.0)
 	_material.set_shader_parameter("edge_softness", _tuning_float("glue_visual_edge_softness", 0.055))
-	_material.set_shader_parameter("velocity", _velocity)
+	_material.set_shader_parameter("velocity", Vector2.ZERO)
 	_material.set_shader_parameter("color", Color(color, 1.0))
 	_update_sprite_scale()
 
 
+func set_wobble_active(active: bool) -> void:
+	pass  # animation is disabled entirely; kept as a no-op compatibility hook
+
+
 func _process(delta: float) -> void:
-	_time += delta
-	_scale = lerpf(_scale, target_scale, minf(delta * 10.0, 1.0))
+	_scale = lerpf(_scale, target_scale, minf(delta * 20.0, 1.0))
 	_update_sprite_scale()
-	if _material != null:
-		_material.set_shader_parameter("time", _time)
-		_material.set_shader_parameter("flow_speed", _tuning_float("glue_visual_flow_speed", 1.35))
-		_material.set_shader_parameter("distortion", _tuning_float("glue_visual_distortion", 0.075))
-		_material.set_shader_parameter("edge_softness", _tuning_float("glue_visual_edge_softness", 0.055))
-		_material.set_shader_parameter("velocity", _velocity)
-		_material.set_shader_parameter("color", Color(color, 1.0))
-		_material.set_shader_parameter("wobble", wobble)
 	queue_redraw()
 
 
@@ -72,10 +68,7 @@ func set_velocity(v: Vector2) -> void:
 
 
 func _draw() -> void:
-	if ring_pulse:
-		var r := base_radius * _scale
-		var p := 0.5 + 0.5 * sin(_time * 5.0)
-		draw_arc(Vector2.ZERO, r + 3.0 + p * 2.5, 0.0, TAU, 36, Color(1, 1, 1, 0.25 + 0.3 * p), 1.5, true)
+	pass
 
 
 func _update_sprite_scale() -> void:

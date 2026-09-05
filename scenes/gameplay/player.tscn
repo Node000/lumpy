@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://d4kf6tmj1531c"]
+
+[ext_resource type="Script" uid="uid://c4n63ljpprydf" path="res://scripts/gameplay/player.gd" id="1_0j0ot"]
+[ext_resource type="Script" uid="uid://k365tnjdxevo" path="res://scripts/gameplay/blob_backdrop.gd" id="2_dap4h"]
+[ext_resource type="SpriteFrames" uid="uid://bsbtryl4v8v8n" path="res://assets/character/lumpy_animations.tres" id="3_ki2oj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
+radius = 18.0
+
+[node name="Player" type="CharacterBody2D" unique_id=657656440]
+script = ExtResource("1_0j0ot")
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=1922993656]
+shape = SubResource("CircleShape2D_bxw12")
+
+[node name="VisualBlob" type="Node2D" parent="." unique_id=895935620]
+position = Vector2(0, -1)
+script = ExtResource("2_dap4h")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1717416711]
+z_index = 2
+position = Vector2(0, -15)
+scale = Vector2(0.72, 0.72)
+sprite_frames = ExtResource("3_ki2oj")
+animation = &"idle"

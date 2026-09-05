@@ -1,7 +1,7 @@
 shader_type canvas_item;
 
 // Local metaball field. All source positions are in this node's pixel space.
-const int MAX_BLOBS = 12;
+const int MAX_BLOBS = 64;
 
 uniform int blob_count = 0;
 uniform vec2 blob_positions[MAX_BLOBS];

@@ -4,7 +4,7 @@ extends Node2D
 ## The field is deliberately separate from pooled GlueBall nodes: collected
 ## balls disappear back into the pool, while this visual is rebuilt from count.
 
-const MAX_BLOBS := 12
+const MAX_BLOBS := 64
 const FIELD_TEXTURE_SIZE := 128.0
 
 var radius := 15.0
@@ -98,14 +98,13 @@ func _update_material() -> void:
 	# Shift the whole cluster down toward the lower body so the collection
 	# center sits low instead of at the player's chest.
 	center += Vector2(0.0, 8.0 / display_scale)
-	# A single core bubble plus one orbiting bubble per carried glue. Each
-	# orbiting bubble rides its own deterministic orbit and radial wobble so
-	# the cluster reads as separate small balls surging, not one smooth mass.
+	# One source per particle: body-placed by golden angle with tiny per-ball
+	# vibration, so the player reads as a dense ball of small granules.
 	for i in count:
-		var source := Vector2.ZERO if i == 0 else _orbit_offset(i)
+		var source := _granule_offset(i)
 		positions.append(center + source / display_scale)
-		var bubble_r := _tuning_float("collection_bubble_core_radius", 7.0) if i == 0 else _tuning_float("collection_bubble_radius", 5.0) * (1.0 + sin(float(i) * 2.7 + _time) * 0.12)
-		radii.append(bubble_r / display_scale)
+		var granule_r := _tuning_float("collection_bubble_radius", 6.0) * (1.0 + sin(float(i) * 2.7 + _time) * 0.10)
+		radii.append(granule_r / display_scale)
 	_material.set_shader_parameter("blob_count", count)
 	_material.set_shader_parameter("blob_positions", positions)
 	_material.set_shader_parameter("blob_radii", radii)
@@ -119,23 +118,21 @@ func _update_material() -> void:
 		_sprite.scale = Vector2.ONE * (radius * 2.0 / FIELD_TEXTURE_SIZE)
 
 
-func _orbit_offset(index: int) -> Vector2:
-	# Golden-angle orbit per bubble: distinct orbit radius (fraction of the
-	# whole body), angular speed and phase, plus a slow radial wobble. Fully
-	# deterministic on index and time so new bubbles emerge smoothly instead of
-	# exploding or drifting away.
+func _granule_offset(index: int) -> Vector2:
+	# Golden-angle spheres-in-body placement: each granule sits inside the
+	# collection disc at a deterministic spot, with a small independent
+	# vibration so the mass reads as living particles rather than a skin.
 	var t := _time
 	var golden := float(index) * 2.39996
-	var orbit_frac := 0.22 + 0.30 * fposmod(golden * 0.61 + t * 0.03, 1.0)
-	var orbit_radius := radius * orbit_frac
-	var angular_speed := 0.7 + fposmod(float(index) * 0.618, 1.0) * 1.1
-	var phase := golden + t * angular_speed
-	var wobble := 1.0 + 0.18 * sin(t * 2.4 + float(index) * 1.9)
-	var pos := Vector2(cos(phase), sin(phase)) * orbit_radius * wobble
-	# Squash the orbit vertically so the cluster is wide and short: the top
-	# never rises above the character's torso and the visual center reads low.
+	# Radial height inside the disc: sqrt offsets bias toward the rim so the
+	# granules look packed instead of clumped at the centre.
+	var radial := sqrt(fposmod(golden * 0.381966, 1.0)) * radius * 0.80
+	var phase := golden + t * (0.25 + fposmod(float(index) * 0.414214, 1.0) * 0.5)
+	var wobble := 1.0 + 0.10 * sin(t * 2.1 + float(index) * 1.7)
+	var pos := Vector2(cos(phase), sin(phase)) * radial * wobble
+	# Squash vertically so the cluster hugs the lower body.
 	pos.y *= 0.72
-	pos.y += -sin(t * 1.1 + float(index) * 1.3) * 2.0
+	pos.y += -sin(t * 1.1 + float(index) * 1.3) * 1.6
 	return pos
 
 

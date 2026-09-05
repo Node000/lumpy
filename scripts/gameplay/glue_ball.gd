@@ -25,6 +25,11 @@ var state: int = State.FLY
 var owner_player: Node2D = null
 var fly_velocity := Vector2.ZERO
 
+# Burst tag: members of one spit share it. Used ONLY at collision time so a
+# particle passes through its own burst siblings (they land side by side
+# without shoving each other), while walls and OLDER piles still stop it.
+var burst_id := -1
+
 var _fly_time := 0.0
 var _stuck_time := 0.0
 var _swelling := false
@@ -38,7 +43,6 @@ func _ready() -> void:
 	if not is_in_group("glue_ball"):
 		add_to_group("glue_ball")
 	_blob.base_radius = GameTuning.glue_ball_radius
-	_blob.ring_pulse = false
 	_blob.color = Color(1, 1, 1, 0.95)
 	if _shape != null:
 		_shape.radius = GameTuning.glue_ball_collision_radius
@@ -58,8 +62,11 @@ func set_pool_active(active: bool) -> void:
 func _apply_state_mask(s: int) -> void:
 	match s:
 		State.FLY:
+			# Flying particles collide with walls AND already-resting particles
+			# (so new shots splat onto piles), but NOT with other flying
+			# particles -- a fresh burst never stops on itself mid-air.
 			collision_layer = LAYER_GLUE_FLY
-			collision_mask = LAYER_ROUGH | LAYER_SMOOTH | LAYER_GLUE_REST | LAYER_GLUE_FLY
+			collision_mask = LAYER_ROUGH | LAYER_SMOOTH | LAYER_GLUE_REST
 		State.STUCK:
 			collision_layer = LAYER_GLUE_REST
 			collision_mask = LAYER_PLAYER | LAYER_GLUE_REST | LAYER_GLUE_FLY
@@ -72,13 +79,14 @@ func reset_ball() -> void:
 	state = State.FLY
 	fly_velocity = Vector2.ZERO
 	owner_player = null
+	burst_id = -1
 	_fly_time = 0.0
 	_stuck_time = 0.0
 	_swelling = false
 	_swell_anim_t = 0.0
-	_blob.ring_pulse = false
 	_blob.target_scale = 1.0
 	_blob.set_velocity(Vector2.ZERO)
+	_blob.set_wobble_active(true)
 	_blob.modulate = Color(1, 1, 1, 1)
 	_apply_state_mask(State.FLY)
 
@@ -90,6 +98,7 @@ func begin_fly(from: Vector2, dir: Vector2, speed: float) -> void:
 	_fly_time = 0.0
 	_blob.target_scale = 1.0
 	_blob.set_velocity(fly_velocity)
+	_blob.set_wobble_active(true)
 	_blob.modulate = Color(1, 1, 1, 1)
 	_apply_state_mask(State.FLY)
 
@@ -97,8 +106,8 @@ func begin_fly(from: Vector2, dir: Vector2, speed: float) -> void:
 func begin_suck(target_player: Node2D) -> void:
 	state = State.SUCK
 	owner_player = target_player
-	_blob.ring_pulse = false
 	_blob.set_velocity(Vector2.ZERO)
+	_blob.set_wobble_active(true)
 	# A sucked ball still needs to stop if the player moves behind a wall.
 	# We perform the wall segment test explicitly below so the ball itself does
 	# not push the player or get caught by the player's collision shape.
@@ -111,10 +120,10 @@ func place_at_rest() -> void:
 	_swell_anim_t = 0.0
 	_swelling = false
 	_apply_state_mask(State.STUCK)
-	_blob.ring_pulse = false
 	_blob.modulate = Color(1, 1, 1, 1)
 	_blob.target_scale = 1.0
 	_blob.set_velocity(Vector2.ZERO)
+	_blob.set_wobble_active(false)
 
 
 func _physics_process(delta: float) -> void:
@@ -135,6 +144,15 @@ func _physics_fly(delta: float) -> void:
 	var motion := fly_velocity * delta
 	if _blob != null:
 		_blob.set_velocity(fly_velocity)
+	# Probe first. Same-burst members pass through each other completely: they
+	# fly and land independently, never pushing siblings apart, so a ball that
+	# would touch an earlier sibling keeps its momentum to the wall.
+	var probe := move_and_collide(motion, true)
+	if probe and burst_id >= 0:
+		var probed := probe.get_collider()
+		if probed is CollisionObject2D and probed.get("burst_id") == burst_id:
+			global_position += motion
+			return
 	var col := move_and_collide(motion)
 	if col:
 		var collider := col.get_collider()
@@ -143,8 +161,11 @@ func _physics_fly(delta: float) -> void:
 			fly_velocity = fly_velocity.bounce(col.get_normal())
 			global_position += col.get_normal() * 0.5
 		else:
+			# Independent landing: stop exactly at its own contact point with a
+			# small settle-off. No scatter, no sidestep.
+			var normal := col.get_normal()
+			global_position += normal * (GameTuning.glue_ball_radius * 0.5)
 			_go_stuck()
-			return
 
 
 func _go_stuck() -> void:
@@ -153,8 +174,10 @@ func _go_stuck() -> void:
 	_swell_anim_t = 0.0
 	_swelling = false
 	_apply_state_mask(State.STUCK)
-	_blob.ring_pulse = true
 	_blob.modulate = Color(1, 1, 1, 1)
+	# A resting particle is static: freeze its surface motion.
+	_blob.set_wobble_active(false)
+	_blob.set_velocity(Vector2.ZERO)
 
 
 func _physics_stuck(_delta: float) -> void:
@@ -164,16 +187,28 @@ func _physics_stuck(_delta: float) -> void:
 		_swell_anim_t = 0.0
 	if _swelling:
 		_swell_anim_t += _delta
-		var t := clampf(_swell_anim_t / GameTuning.glue_swell_anim_time, 0.0, 1.0)
-		var eased := 1.0 - pow(1.0 - t, 3.0)
+		# Elastic swell: overshoot the target then bounce back, like a blob of
+		# rubber. Visual scale and collision radius share one eased value so
+		# the particle's footprint always matches its looks.
+		var eased := _elastic_out(clampf(_swell_anim_t / GameTuning.glue_swell_anim_time, 0.0, 1.0))
+		var factor := lerpf(1.0, GameTuning.glue_swell_collision_factor, eased)
 		if _blob != null:
 			_blob.target_scale = lerpf(1.0, GameTuning.glue_swell_scale, eased)
 		if _shape != null:
-			_shape.radius = GameTuning.glue_ball_collision_radius * lerpf(1.0, GameTuning.glue_swell_collision_factor, eased)
-		if t >= 1.0:
+			_shape.radius = GameTuning.glue_ball_collision_radius * factor
+		if _swell_anim_t >= GameTuning.glue_swell_anim_time:
 			_swelling = false
-			_blob.ring_pulse = false
 	queue_redraw()
+
+
+func _elastic_out(t: float) -> float:
+	# t=0 -> 0, t=1 -> 1, with one overshoot past 1 and a settle-back.
+	var c4 := 2.0 * PI / 3.0
+	if t == 0.0:
+		return 0.0
+	if t == 1.0:
+		return 1.0
+	return pow(2.0, -10.0 * t) * sin((t * 10.0 - 0.75) * c4) + 1.0
 
 
 func _physics_suck(delta: float) -> void:

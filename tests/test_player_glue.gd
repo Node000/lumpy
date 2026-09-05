@@ -6,15 +6,21 @@ extends SceneTree
 
 var _failed := false
 var _tuning: Node
+var _glue_pool: Node
+var _gameplay_events: Node
 
 
 func _initialize() -> void:
 	_tuning = root.get_node_or_null("GameTuning")
+	_glue_pool = root.get_node_or_null("GluePool")
+	_gameplay_events = root.get_node_or_null("GameplayEvents")
 	_assert(_tuning != null, "game tuning autoload exists")
+	_assert(_glue_pool != null, "glue pool autoload exists")
 	_assert(load("res://scenes/gameplay/glue_ball.tscn") != null, "glue ball scene loads")
 	_assert(load("res://scenes/levels/player_test.tscn") != null, "player test scene loads")
 	_assert(load("res://scenes/levels/paint_lab.tscn") != null, "paint lab scene loads")
 	_assert(load("res://scripts/gameplay/paint_wall.gd") != null, "paint wall script loads")
+	_assert(load("res://scripts/gameplay/glue_spot.gd") != null, "glue spot script loads")
 	_assert(load("res://scenes/levels/shader_test.tscn") != null, "shader test scene loads")
 	_assert(load("res://shaders/liquid_ball.gdshader") != null, "liquid shader loads")
 	_assert(load("res://shaders/liquid_blob.gdshader") != null, "single blob liquid shader loads")
@@ -44,7 +50,9 @@ func _initialize() -> void:
 	await process_frame
 	var player := level.get_node_or_null("Player")
 	_assert(player != null, "player exists in player test")
-	_assert(player.get("glue_count") == 3, "player starts with configured glue")
+	_assert(player.get("glue_count") == 30, "player starts with 30 glue particles")
+	_assert(_tuning.glue_ball_radius == 6.0 and _tuning.glue_ball_collision_radius == 6.0, "glue particle radius equals collision size")
+	_assert(_tuning.glue_jump_weight_max == 0.5, "jump weight cap is 50%")
 	_assert(player.get("collision_layer") == 16, "player uses collision layer 16")
 	var sprite := player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 	_assert(sprite != null and sprite.sprite_frames == character_frames, "player uses the character animation resource")
@@ -58,10 +66,11 @@ func _initialize() -> void:
 	_assert((collection_sprite.material as ShaderMaterial).shader == load("res://shaders/liquid_collection.gdshader"), "player collection uses the collection shader")
 	_assert(is_equal_approx(collection.get_collection_bottom_y(), _tuning.player_collection_bottom_y), "player liquid collection bottom starts anchored")
 	var start_bottom := collection.get_collection_bottom_y()
-	player.set_glue_count(9)
+	player.set_glue_count(90)
 	await _wait_physics_frames(20)
 	_assert(is_equal_approx(collection.get_collection_bottom_y(), start_bottom), "player liquid collection bottom stays anchored while growing")
 	_assert(collection.position.y < 0.0, "player liquid collection center moves upward while growing")
+	_assert(collection.get("_glue_count") == 64, "player collection clamps at 64 tracked particles")
 	var collision := player.get_node_or_null("Collision") as CollisionShape2D
 	var collision_bottom := collision.position.y + (collision.shape as CircleShape2D).radius
 	_assert(is_equal_approx(collision_bottom, _tuning.body_collision_bottom_offset), "collision shape bottom stays anchored at feet while growing")
@@ -74,6 +83,7 @@ func _initialize() -> void:
 	var ball_collision := ball.get_node_or_null("Collision") as CollisionShape2D
 	_assert(ball_blob != null and is_equal_approx(ball_blob.base_radius, _tuning.glue_ball_radius), "free glue ball uses tuned visual radius")
 	_assert(ball_collision != null and is_equal_approx((ball_collision.shape as CircleShape2D).radius, _tuning.glue_ball_collision_radius), "free glue ball uses tuned collision radius")
+	_assert(_tuning.glue_swell_collision_factor == 3.0, "swelled collision size is 3x")
 	ball.free()
 	await _wait_physics_frames(20)
 	_assert(sprite.animation == &"idle", "player settles into idle animation")
@@ -90,6 +100,15 @@ func _initialize() -> void:
 	_assert(shelf_collision != null and shelf_collision.shape is RectangleShape2D, "paint lab wall has rectangle collision")
 	var shelf_size: Vector2 = shelf.call("get_wall_size")
 	_assert(is_equal_approx(shelf_size.x, 1.8) and is_equal_approx(shelf_size.y, 0.24), "paint lab wall size derives from size_px")
+	var spot := paint_level.get_node_or_null("GlueSpot")
+	if spot == null:
+		spot = Node2D.new()
+		spot.name = "GlueSpot"
+		spot.set_script(load("res://scripts/gameplay/glue_spot.gd"))
+		spot.count = 4
+		paint_level.add_child(spot)
+	await process_frame
+	_assert(spot.call("get_spawned_count") == 4, "glue spot spawns configured resting particles")
 	paint_level.free()
 	await _wait_physics_frames(2)
 
@@ -109,6 +128,9 @@ func _initialize() -> void:
 	Input.action_press("spit_glue")
 	await _wait_until_animation(sprite, &"spit", 8)
 	_assert(sprite.animation == &"spit", "spit input activates spit animation")
+	var busy_after_spit: int = _glue_pool.get_busy_count()
+	_assert(busy_after_spit >= 10, "one spit expels 10 glue particles")
+	_assert(player.get("glue_count") == 80, "one spit spends 10 particles from 90")
 	Input.action_release("spit_glue")
 	await _wait_physics_frames(20)
 

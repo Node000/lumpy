@@ -31,6 +31,15 @@ func _initialize() -> void:
 	# A rough block on the right side to test glue stopping.
 	root.add_child(_paint_wall("BlockRough", Vector2(230, 360), Vector2(70, 90), false))
 
+	# A resting glue pile spawned by the GlueSpot component, ready to suck.
+	var spot := Node2D.new()
+	spot.name = "GlueSpot"
+	spot.position = Vector2(160, 392)
+	spot.set_script(load("res://scripts/gameplay/glue_spot.gd"))
+	spot.count = 4
+	spot.spread = 12.0
+	root.add_child(spot)
+
 	var hud_layer := CanvasLayer.new()
 	hud_layer.name = "HUD"
 	hud_layer.layer = 10

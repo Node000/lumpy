@@ -14,10 +14,10 @@ const LAYER_GLUE_REST := 4
 const LAYER_GLUE_FLY := 8
 const LAYER_PLAYER := 16
 
-@onready var _collision: CollisionShape2D = $Collision
-@onready var _blob: BlobBackdrop = $VisualBlob
-@onready var _camera: Camera2D = $Camera2D
-@onready var _animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var _collision: CollisionShape2D = get_node_or_null("Collision") as CollisionShape2D
+@onready var _blob: BlobBackdrop = get_node_or_null("VisualBlob") as BlobBackdrop
+@onready var _camera: Camera2D = get_node_or_null("Camera2D") as Camera2D
+@onready var _animated_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 
 var glue_count: int = 0
 var facing := 1
@@ -150,8 +150,10 @@ func _physics_process(delta: float) -> void:
 
 
 func _do_jump() -> void:
-	var coeff := GameTuning.glue_effect_max_coeff * (float(mini(glue_count, GameTuning.glue_effect_cap)) / float(GameTuning.glue_effect_cap))
-	var vy := GameTuning.jump_velocity * (1.0 + coeff)
+	# Heavy glue lowers jump height: at the weight cap the jump keeps only
+	# (1 - glue_jump_weight_max) of its base height.
+	var weight := clampf(float(glue_count) / float(GameTuning.glue_effect_cap), 0.0, 1.0)
+	var vy := GameTuning.jump_velocity * (1.0 - GameTuning.glue_jump_weight_max * weight)
 	velocity.y = vy
 	_jump_hold_timer = GameTuning.jump_hold_time
 	GameplayEvents.emit_glue_changed(glue_count, GameTuning.max_glue)  # no-op keeps signal warm
@@ -172,19 +174,45 @@ func _update_body_radius() -> void:
 func _spit() -> void:
 	if _spit_cooldown_timer > 0.0:
 		return
-	if glue_count <= 0:
+	if glue_count < GameTuning.glue_particles_per_unit:
 		return
 	_spit_cooldown_timer = GameTuning.spit_cooldown
 	_play_action_animation("spit", 0.30)
-	set_glue_count(glue_count - 1)
-	var ball: Node = GluePool.take_ball()
-	if ball == null:
-		set_glue_count(glue_count + 1)
-		return
+	set_glue_count(glue_count - GameTuning.glue_particles_per_unit)
 	var dir := _aim_dir
 	var r: float = _current_radius()
 	var muzzle := global_position + dir * (r + GameTuning.glue_ball_radius + 3.0)
-	ball.call("begin_fly", muzzle, dir, GameTuning.spit_speed)
+	var n := GameTuning.glue_particles_per_unit
+	# One spit fires one burst. Members keep INDEPENDENT physics (separate
+	# flight, separate landing) but share a burst id so they never shove each
+	# other apart mid-air or at impact. The layout is a disc PERPENDICULAR to
+	# the aim direction, so every ball has the same flight depth: the whole
+	# burst reaches the wall on the same frame and lands as one bump.
+	var bid := 1 + int(Time.get_ticks_usec() % 1000000000)
+	var fired := 0
+	for i in n:
+		var ball: Node = GluePool.take_ball()
+		if ball == null:
+			continue
+		ball.set("burst_id", bid)
+		var offset := _burst_offset(i, n, dir)
+		var drift := 1.0 + (fposmod(float(i) * 0.618, 1.0) - 0.5) * 0.016
+		ball.call("begin_fly", muzzle + offset, dir, GameTuning.spit_speed * drift)
+		fired += 1
+	if fired == 0:
+		set_glue_count(glue_count + GameTuning.glue_particles_per_unit)
+
+
+func _burst_offset(i: int, n: int, _dir: Vector2) -> Vector2:
+	# Full golden-angle disc. Slight depth spread is fine: same-burst members
+	# pass through each other in flight (burst_id probe) and reach the wall
+	# themselves, so the clump reads as one big ball mid-air and lands as a
+	# pile where later balls settle on/behind earlier ones -- never a line.
+	if i == 0:
+		return Vector2.ZERO
+	var golden := float(i) * 2.39996
+	var ring := 12.0 * sqrt(float(i) / float(n - 1))
+	return Vector2(cos(golden), sin(golden)) * ring
 
 
 func _current_radius() -> float:

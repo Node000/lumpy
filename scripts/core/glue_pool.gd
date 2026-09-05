@@ -3,7 +3,7 @@ extends Node
 ## Players pull balls with take_ball(), give them back with release_ball().
 
 const BALL_SCENE := "res://scenes/gameplay/glue_ball.tscn"
-const POOL_LIMIT := 48
+const POOL_LIMIT := 200
 
 var _available: Array[Node] = []
 var _busy: Array[Node] = []
