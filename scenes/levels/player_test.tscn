@@ -7,35 +7,44 @@
 [ext_resource type="Script" uid="uid://b0hm3daen57dg" path="res://scripts/gameplay/test_wall.gd" id="5_ro0ym"]
 [ext_resource type="Script" uid="uid://dhthq280ccnvi" path="res://scripts/gameplay/player_test_level.gd" id="6_o7xpx"]
 [ext_resource type="Script" uid="uid://x7756bwqmrgc" path="res://scripts/gameplay/level_hud.gd" id="7_2blty"]
+[ext_resource type="Texture2D" uid="uid://dwrqhsd4ddj3j" path="res://design/char.png" id="8_bvm0p"]
+[ext_resource type="Texture2D" uid="uid://bevvhvyg30r5d" path="res://design/level.png" id="9_f482d"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
 radius = 18.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tp06i"]
-size = Vector2(320, 24)
+size = Vector2(320, 24.068962)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p5qbh"]
+size = Vector2(320, 60.362072)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ro0ym"]
+size = Vector2(130.625, 24.318966)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ugs25"]
-size = Vector2(720, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_a7rkt"]
-size = Vector2(24, 300)
+size = Vector2(442, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vb2ee"]
-size = Vector2(24, 420)
+size = Vector2(423, 420)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_f7fgh"]
-size = Vector2(180, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bu2lm"]
-size = Vector2(150, 16)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f482d"]
+size = Vector2(129, 372)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_drc7l"]
-size = Vector2(16, 90)
+size = Vector2(150, 372)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o7xpx"]
+size = Vector2(473, 305)
 
 [node name="PlayerTest" type="Node2D" unique_id=408281853]
 
 [node name="Backdrop" type="Node2D" parent="." unique_id=1080361096]
 script = ExtResource("1_nioiv")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1782223568]
+position = Vector2(372, 267)
+zoom = Vector2(0.61, 0.61)
 
 [node name="Player" type="CharacterBody2D" parent="." unique_id=1107322508]
 position = Vector2(180, 400)
@@ -55,58 +64,86 @@ scale = Vector2(0.72, 0.72)
 sprite_frames = ExtResource("4_p5qbh")
 animation = &"idle"
 
-[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1782223568]
-
 [node name="Wall" type="StaticBody2D" parent="." unique_id=2043727294]
-position = Vector2(40, 520)
+position = Vector2(78, 577.99994)
+scale = Vector2(1.6, 11.5999975)
 script = ExtResource("5_ro0ym")
 
 [node name="Shape" type="CollisionShape2D" parent="Wall" unique_id=160067285]
+position = Vector2(0, -0.03448105)
+scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_tp06i")
 
+[node name="Wall2" type="StaticBody2D" parent="." unique_id=590193170]
+position = Vector2(-377, 298.99997)
+scale = Vector2(1.6, 11.5999975)
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="Wall2" unique_id=1234970502]
+position = Vector2(0, -18.181044)
+scale = Vector2(1, 1.0000001)
+shape = SubResource("RectangleShape2D_p5qbh")
+
+[node name="Wall3" type="StaticBody2D" parent="." unique_id=406059573]
+position = Vector2(201, 197.99998)
+scale = Vector2(1.6, 11.5999975)
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="Wall3" unique_id=892806051]
+position = Vector2(-91.25, -1.0301723)
+scale = Vector2(1, 1.0000001)
+shape = SubResource("RectangleShape2D_ro0ym")
+
 [node name="@StaticBody2D@2" type="StaticBody2D" parent="." unique_id=166537177]
-position = Vector2(430, 540)
+position = Vector2(494, 735)
 script = ExtResource("5_ro0ym")
 
 [node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@2" unique_id=644190170]
+position = Vector2(-139, 0)
 shape = SubResource("RectangleShape2D_ugs25")
 
-[node name="@StaticBody2D@3" type="StaticBody2D" parent="." unique_id=728747365]
-position = Vector2(120, 250)
-script = ExtResource("5_ro0ym")
-
-[node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@3" unique_id=938714320]
-shape = SubResource("RectangleShape2D_a7rkt")
-
 [node name="@StaticBody2D@4" type="StaticBody2D" parent="." unique_id=873565523]
-position = Vector2(890, 330)
+position = Vector2(586, 636)
 script = ExtResource("5_ro0ym")
 
 [node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@4" unique_id=1891134067]
+position = Vector2(199.5, 0)
 shape = SubResource("RectangleShape2D_vb2ee")
 
-[node name="@StaticBody2D@5" type="StaticBody2D" parent="." unique_id=884494218]
-position = Vector2(640, 390)
+[node name="_StaticBody2D_4" type="StaticBody2D" parent="." unique_id=588044423]
+position = Vector2(647, 15)
 script = ExtResource("5_ro0ym")
 
-[node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@5" unique_id=685880849]
-shape = SubResource("RectangleShape2D_f7fgh")
-
-[node name="WallSmooth" type="StaticBody2D" parent="." unique_id=1719339860]
-position = Vector2(680, 150)
-collision_layer = 2
-script = ExtResource("5_ro0ym")
-
-[node name="Shape" type="CollisionShape2D" parent="WallSmooth" unique_id=143516242]
-shape = SubResource("RectangleShape2D_bu2lm")
+[node name="Shape" type="CollisionShape2D" parent="_StaticBody2D_4" unique_id=623524314]
+position = Vector2(199.5, 0)
+shape = SubResource("RectangleShape2D_vb2ee")
 
 [node name="@StaticBody2D@6" type="StaticBody2D" parent="." unique_id=1136614665]
-position = Vector2(330, 330)
+position = Vector2(42, -109)
 collision_layer = 2
 script = ExtResource("5_ro0ym")
 
 [node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@6" unique_id=897906733]
+position = Vector2(54.5, 0.5)
+shape = SubResource("RectangleShape2D_f482d")
+
+[node name="_StaticBody2D_7" type="StaticBody2D" parent="." unique_id=501588212]
+position = Vector2(981, 299)
+collision_layer = 2
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="_StaticBody2D_7" unique_id=1037776732]
+position = Vector2(64, 34)
 shape = SubResource("RectangleShape2D_drc7l")
+
+[node name="_StaticBody2D_6" type="StaticBody2D" parent="." unique_id=1144367148]
+position = Vector2(168, -232)
+collision_layer = 2
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="_StaticBody2D_6" unique_id=486495550]
+position = Vector2(229, 0)
+shape = SubResource("RectangleShape2D_o7xpx")
 
 [node name="LevelLogic" type="Node2D" parent="." unique_id=487241875]
 script = ExtResource("6_o7xpx")
@@ -140,3 +177,13 @@ offset_right = 24.0
 offset_bottom = 58.0
 theme_override_colors/font_color = Color(0.75, 0.78, 0.88, 1)
 text = "A/D move   Space jump   LMB spit   RMB suck   R restart"
+
+[node name="Char" type="Sprite2D" parent="." unique_id=1649066495]
+visible = false
+position = Vector2(396.99997, 365.00003)
+scale = Vector2(0.86134446, 0.8613446)
+texture = ExtResource("8_bvm0p")
+
+[node name="Level" type="Sprite2D" parent="." unique_id=582744601]
+position = Vector2(408, 279)
+texture = ExtResource("9_f482d")
