@@ -140,10 +140,8 @@ func _initialize() -> void:
 	Input.action_release("suck_glue")
 	await _wait_physics_frames(1)
 
-	var balls := get_nodes_in_group("glue_ball")
-	_assert(balls.size() >= 4, "player test spawns four glue balls")
-	for pooled_ball in balls:
-		_assert(pooled_ball.has_method("place_at_rest"), "glue ball exposes rest state")
+	_assert(level.get_node_or_null("LevelLogic") == null, "player test no longer auto-spawns glue")
+	_assert(load("res://scripts/gameplay/glue_spot.gd") != null, "manual glue spot component stays available")
 
 	level.free()
 	if _failed:

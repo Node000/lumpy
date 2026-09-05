@@ -4,8 +4,6 @@
 [ext_resource type="Script" uid="uid://c4n63ljpprydf" path="res://scripts/gameplay/player.gd" id="2_bvm0p"]
 [ext_resource type="Script" uid="uid://k365tnjdxevo" path="res://scripts/gameplay/blob_backdrop.gd" id="3_f482d"]
 [ext_resource type="SpriteFrames" uid="uid://bsbtryl4v8v8n" path="res://assets/character/lumpy_animations.tres" id="4_p5qbh"]
-[ext_resource type="Script" uid="uid://b0hm3daen57dg" path="res://scripts/gameplay/test_wall.gd" id="5_ro0ym"]
-[ext_resource type="Script" uid="uid://dhthq280ccnvi" path="res://scripts/gameplay/player_test_level.gd" id="6_o7xpx"]
 [ext_resource type="Script" uid="uid://x7756bwqmrgc" path="res://scripts/gameplay/level_hud.gd" id="7_2blty"]
 [ext_resource type="Texture2D" uid="uid://dwrqhsd4ddj3j" path="res://design/char.png" id="8_bvm0p"]
 [ext_resource type="Texture2D" uid="uid://bevvhvyg30r5d" path="res://design/level.png" id="9_f482d"]
@@ -168,7 +166,6 @@ animation = &"idle"
 [node name="Wall2" type="StaticBody2D" parent="." unique_id=590193170]
 position = Vector2(-377, 298.99997)
 scale = Vector2(1.6, 11.5999975)
-script = ExtResource("5_ro0ym")
 
 [node name="Shape24" type="CollisionShape2D" parent="Wall2" unique_id=160067285]
 position = Vector2(284.375, 24.017246)
@@ -364,9 +361,6 @@ shape = SubResource("RectangleShape2D_drc7l")
 position = Vector2(483.75, -40.366386)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_o7xpx")
-
-[node name="LevelLogic" type="Node2D" parent="." unique_id=487241875]
-script = ExtResource("6_o7xpx")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1604737722]
 layer = 10
