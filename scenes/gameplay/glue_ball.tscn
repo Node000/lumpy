@@ -1,10 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b2amvpoa8a8cv"]
 
-[ext_resource type="Script" path="res://scripts/gameplay/glue_ball.gd" id="1_r8os5"]
-[ext_resource type="Script" path="res://scripts/gameplay/blob_sprite.gd" id="2_h22gf"]
+[ext_resource type="Script" uid="uid://m0myjvy1jbkp" path="res://scripts/gameplay/glue_ball.gd" id="1_r8os5"]
+[ext_resource type="Script" uid="uid://b70akj1alpbv" path="res://scripts/gameplay/blob_sprite.gd" id="2_h22gf"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_ssskg"]
-radius = 6.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_f7fgh"]
 
 [node name="GlueBall" type="CharacterBody2D" unique_id=1240156677]
 script = ExtResource("1_r8os5")
@@ -15,4 +14,4 @@ script = ExtResource("1_r8os5")
 script = ExtResource("2_h22gf")
 
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=195646330]
-shape = SubResource("CircleShape2D_ssskg")
+shape = SubResource("CircleShape2D_f7fgh")

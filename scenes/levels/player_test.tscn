@@ -5,19 +5,8 @@
 [ext_resource type="Script" uid="uid://k365tnjdxevo" path="res://scripts/gameplay/blob_backdrop.gd" id="3_f482d"]
 [ext_resource type="SpriteFrames" uid="uid://bsbtryl4v8v8n" path="res://assets/character/lumpy_animations.tres" id="4_p5qbh"]
 [ext_resource type="Script" uid="uid://x7756bwqmrgc" path="res://scripts/gameplay/level_hud.gd" id="7_2blty"]
-[ext_resource type="Texture2D" uid="uid://dwrqhsd4ddj3j" path="res://design/char.png" id="8_bvm0p"]
-[ext_resource type="Texture2D" uid="uid://bevvhvyg30r5d" path="res://design/level.png" id="9_f482d"]
-[ext_resource type="Texture2D" uid="uid://06ehfwrq2kqq" path="res://design/level2.png" id="10_bu2lm"]
-[ext_resource type="Texture2D" uid="uid://b3s3x1tj8n0pp" path="res://design/level3.png" id="11_drc7l"]
-[ext_resource type="Texture2D" uid="uid://bib47bch07uh7" path="res://design/level5.png" id="12_b0qq3"]
-[ext_resource type="Texture2D" uid="uid://cf4cxq8g42or1" path="res://design/level6.png" id="13_jbuld"]
-[ext_resource type="Texture2D" uid="uid://dgm1uietkphrv" path="res://design/level7.png" id="14_n4o2o"]
-[ext_resource type="Texture2D" uid="uid://flmm12jt1qaq" path="res://design/level8.png" id="15_vrg02"]
-[ext_resource type="Texture2D" uid="uid://b5vf3q8ifpr37" path="res://design/level9.png" id="16_v27ed"]
-[ext_resource type="Texture2D" uid="uid://o2h17olo1nje" path="res://design/level10.png" id="17_diyin"]
-[ext_resource type="Texture2D" uid="uid://cokgo542md74f" path="res://design/level11.png" id="18_wnq7u"]
-[ext_resource type="Texture2D" uid="uid://dq8vofgfkyewn" path="res://design/level12.png" id="19_3diia"]
-[ext_resource type="Texture2D" uid="uid://cp8t0adpebi1w" path="res://design/level13.png" id="20_rpmxk"]
+[ext_resource type="Script" uid="uid://c41i0hd8ph11c" path="res://scripts/gameplay/glue_spot.gd" id="8_f482d"]
+[ext_resource type="Texture2D" uid="uid://c20t1iunhoa6i" path="res://design/level2final22.png" id="20_bu2lm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
 radius = 18.0
@@ -35,10 +24,10 @@ size = Vector2(2561.875, 47.758514)
 size = Vector2(145, 41.03444)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_br73u"]
-size = Vector2(413.75, 34.310356)
+size = Vector2(413.75, 26.206905)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_et2a1"]
-size = Vector2(427.5, 22.67242)
+size = Vector2(427.5, 19.396544)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8bv17"]
 size = Vector2(214.375, 22.67242)
@@ -47,7 +36,7 @@ size = Vector2(214.375, 22.67242)
 size = Vector2(317.1875, 22.67242)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6g6da"]
-size = Vector2(106.71875, 22.67242)
+size = Vector2(106.71875, 19.870695)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eh0ru"]
 size = Vector2(192.10938, 8.232756)
@@ -164,6 +153,7 @@ sprite_frames = ExtResource("4_p5qbh")
 animation = &"idle"
 
 [node name="Wall2" type="StaticBody2D" parent="." unique_id=590193170]
+z_index = 1
 position = Vector2(-377, 298.99997)
 scale = Vector2(1.6, 11.5999975)
 
@@ -188,12 +178,12 @@ scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_el8q8")
 
 [node name="Shape18" type="CollisionShape2D" parent="Wall2" unique_id=1098760425]
-position = Vector2(1023.125, -248.44833)
+position = Vector2(1023.125, -252.50006)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_br73u")
 
 [node name="Shape19" type="CollisionShape2D" parent="Wall2" unique_id=1120354649]
-position = Vector2(616.875, -235.99144)
+position = Vector2(616.875, -234.3535)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_et2a1")
 
@@ -208,7 +198,7 @@ scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_8oobl")
 
 [node name="Shape22" type="CollisionShape2D" parent="Wall2" unique_id=1693421707]
-position = Vector2(665.2344, -203.87936)
+position = Vector2(665.2344, -202.4785)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_6g6da")
 
@@ -392,68 +382,22 @@ offset_bottom = 58.0
 theme_override_colors/font_color = Color(0.75, 0.78, 0.88, 1)
 text = "A/D move   Space jump   LMB spit   RMB suck   R restart"
 
-[node name="Char" type="Sprite2D" parent="." unique_id=1649066495]
-visible = false
-position = Vector2(396.99997, 365.00003)
-scale = Vector2(0.86134446, 0.8613446)
-texture = ExtResource("8_bvm0p")
+[node name="Node2D" type="Node2D" parent="." unique_id=484379513]
+position = Vector2(296, 322)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
 
-[node name="Level" type="Sprite2D" parent="." unique_id=582744601]
-visible = false
-position = Vector2(408, 279)
-texture = ExtResource("9_f482d")
-
-[node name="Level2" type="Sprite2D" parent="." unique_id=609166284]
-position = Vector2(689, -3001)
-texture = ExtResource("10_bu2lm")
+[node name="Level2Final22" type="Sprite2D" parent="." unique_id=545754692]
+z_index = 4
+texture_filter = 1
+position = Vector2(2609, -1381)
+texture = ExtResource("20_bu2lm")
 metadata/_edit_lock_ = true
 
-[node name="Level3" type="Sprite2D" parent="." unique_id=261175062]
-position = Vector2(2610, -3001)
-texture = ExtResource("11_drc7l")
-metadata/_edit_lock_ = true
-
-[node name="Level5" type="Sprite2D" parent="." unique_id=1043219639]
-position = Vector2(689, -1921)
-texture = ExtResource("12_b0qq3")
-metadata/_edit_lock_ = true
-
-[node name="Level6" type="Sprite2D" parent="." unique_id=1711947756]
-position = Vector2(2610, -1921)
-texture = ExtResource("13_jbuld")
-metadata/_edit_lock_ = true
-
-[node name="Level7" type="Sprite2D" parent="." unique_id=1886345739]
-position = Vector2(4538, -1921)
-texture = ExtResource("14_n4o2o")
-metadata/_edit_lock_ = true
-
-[node name="Level8" type="Sprite2D" parent="." unique_id=1119336303]
-position = Vector2(689, -841)
-texture = ExtResource("15_vrg02")
-metadata/_edit_lock_ = true
-
-[node name="Level9" type="Sprite2D" parent="." unique_id=1837529530]
-position = Vector2(2610, -841)
-texture = ExtResource("16_v27ed")
-metadata/_edit_lock_ = true
-
-[node name="Level10" type="Sprite2D" parent="." unique_id=374276873]
-position = Vector2(4530, -841)
-texture = ExtResource("17_diyin")
-metadata/_edit_lock_ = true
-
-[node name="Level11" type="Sprite2D" parent="." unique_id=806810463]
-position = Vector2(688, 240)
-texture = ExtResource("18_wnq7u")
-metadata/_edit_lock_ = true
-
-[node name="Level12" type="Sprite2D" parent="." unique_id=1360785696]
-position = Vector2(2609, 240)
-texture = ExtResource("19_3diia")
-metadata/_edit_lock_ = true
-
-[node name="Level13" type="Sprite2D" parent="." unique_id=430419771]
-position = Vector2(4530, 239)
-texture = ExtResource("20_rpmxk")
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=171644288]
+z_index = -1
+position = Vector2(-1139, 186)
+color = Color(0.39942783, 0.3994278, 0.39942777, 1)
+polygon = PackedVector2Array(308, 937, 87, -4082, 7068, -3940, 7144, 933)
 metadata/_edit_lock_ = true

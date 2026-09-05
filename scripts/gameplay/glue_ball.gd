@@ -1,4 +1,4 @@
-﻿extends CharacterBody2D
+extends CharacterBody2D
 ## A glue ball. State machine on top of a CharacterBody2D so a resting ball is
 ## just a non-moving body the player can stand on. Flying balls move
 ## manually with move_and_collide and read the collided body's layer:
@@ -87,7 +87,7 @@ func reset_ball() -> void:
 	_blob.target_scale = 1.0
 	_blob.set_velocity(Vector2.ZERO)
 	_blob.set_wobble_active(true)
-	_blob.modulate = Color(1, 1, 1, 1)
+	_blob.modulate = Color(0.984, 0.965, 0.953, 1.0)
 	_apply_state_mask(State.FLY)
 
 
@@ -98,7 +98,7 @@ func begin_fly(from: Vector2, dir: Vector2, speed: float) -> void:
 	_fly_time = 0.0
 	_blob.target_scale = 1.0
 	_blob.set_velocity(fly_velocity)
-	_blob.set_wobble_active(true)
+	_blob.set_wobble_active(false)
 	_blob.modulate = Color(1, 1, 1, 1)
 	_apply_state_mask(State.FLY)
 
@@ -107,7 +107,7 @@ func begin_suck(target_player: Node2D) -> void:
 	state = State.SUCK
 	owner_player = target_player
 	_blob.set_velocity(Vector2.ZERO)
-	_blob.set_wobble_active(true)
+	_blob.set_wobble_active(false)
 	# A sucked ball still needs to stop if the player moves behind a wall.
 	# We perform the wall segment test explicitly below so the ball itself does
 	# not push the player or get caught by the player's collision shape.
@@ -248,4 +248,3 @@ func _collect() -> void:
 func set_glue_color(c: Color) -> void:
 	if _blob != null:
 		_blob.set_tint(c)
-
