@@ -21,7 +21,7 @@ Prototype platformer and puzzle interaction loop. Player and glue balls are
 ### GlueBall
 - File: `res://scenes/gameplay/glue_ball.tscn`
 - Root: `CharacterBody2D`
-- Children: `Visual/GlueBody`, `Collision`
+- Children: `Visual/GlueBody`, `Collision`; the glue body is a static circle
 
 ### Player Test
 - File: `res://scenes/levels/player_test.tscn`
@@ -36,13 +36,21 @@ Prototype platformer and puzzle interaction loop. Player and glue balls are
 ## Scripts
 
 - `res://scripts/gameplay/player.gd`: movement, variable jump, coyote/buffer,
-  spit/suck, body size and jump-height mapping.
+  spit/suck, compound particle collision, and jump-height mapping.
+- `res://scripts/gameplay/blob_backdrop.gd`: deterministic player particle
+  layout, independent `BlobSprite` visuals, and bottom anchoring.
 - `res://scripts/gameplay/glue_ball.gd`: FLY/STUCK/SUCK state machine, smooth
-  wall reflection, rough collision stop, swell animation and collection.
+  wall reflection, rough collision stop, collision-free suction and collection;
+  sucked balls bypass all collision while returning.
 - `res://scripts/core/gameplay_tuning.gd`: single tuning autoload.
 - `res://scripts/core/gameplay_events.gd`: cross-scene glue count signal.
 - `res://scripts/core/glue_pool.gd`: pooled glue ball instances.
 - `res://scripts/gameplay/test_wall.gd`: per-object smooth-wall property.
+- `res://scripts/gameplay/room_region.gd`: room marker node (hand-tuned rect,
+  focus point) for the big-map camera.
+- `res://scripts/gameplay/room_camera.gd`: room-locked camera — snaps to the
+  room that holds the player, pans on room crossing, fits a room to the
+  viewport.
 - `res://scripts/shaders/metaball_field.gd`: metaball shader demo controller.
 - `res://scripts/shaders/liquid_demo.gd`: single liquid shader demo controller.
 
@@ -62,7 +70,10 @@ Layer 1 is rough wall, layer 2 is smooth wall, layer 3 is resting glue, layer
 ## QA
 
 - `tests/test_player_glue.gd` validates scene/resource loading, player setup,
-  glue pool instances, and shader resources.
+  glue pool instances, independent particle visuals, compound colliders, and
+  shader resources.
+- `tests/test_room_camera.gd` validates room-region markers, start-room snap,
+  horizontal/vertical pan, in-room lock, and far-teleport settling.
 - Windowed capture helper: `scripts/qa/visual_capture.gd` with user args
   `--scene=res://... --output=...`.
 

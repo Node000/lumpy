@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lumpy 音频资源审阅稿</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #FBFBF9; --card: #FFFFFF; --ink: #22262C; --muted: #5A6470; --line: #DFE3E1;
+    --accent: #0E7C6F; --accent-soft: #E7F1EF; --nut-bg: #EFF5F3; --nut-line: #C9DAD6;
+    --ok: #2E7D4F; --warn: #9A6B15; --bad: #A8443A;
+    --ok-bg: #E8F3EC; --warn-bg: #F7EFDD; --bad-bg: #F7E7E4;
+    --code-bg: #F3F4F2; --flow-bg: #F6F7F5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #14171A; --card: #1B1F23; --ink: #E6E9EA; --muted: #99A3AC; --line: #2D3337;
+      --accent: #43BFAD; --accent-soft: #1C2B29; --nut-bg: #1D2926; --nut-line: #2E4440;
+      --ok: #57C289; --warn: #DDB25A; --bad: #DF8177;
+      --ok-bg: #1B2B21; --warn-bg: #2C2517; --bad-bg: #2E1D1A;
+      --code-bg: #21262B; --flow-bg: #1E2327;
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #FBFBF9; --card: #FFFFFF; --ink: #22262C; --muted: #5A6470; --line: #DFE3E1;
+    --accent: #0E7C6F; --accent-soft: #E7F1EF; --nut-bg: #EFF5F3; --nut-line: #C9DAD6;
+    --ok: #2E7D4F; --warn: #9A6B15; --bad: #A8443A;
+    --ok-bg: #E8F3EC; --warn-bg: #F7EFDD; --bad-bg: #F7E7E4;
+    --code-bg: #F3F4F2; --flow-bg: #F6F7F5;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #14171A; --card: #1B1F23; --ink: #E6E9EA; --muted: #99A3AC; --line: #2D3337;
+    --accent: #43BFAD; --accent-soft: #1C2B29; --nut-bg: #1D2926; --nut-line: #2E4440;
+    --ok: #57C289; --warn: #DDB25A; --bad: #DF8177;
+    --ok-bg: #1B2B21; --warn-bg: #2C2517; --bad-bg: #2E1D1A;
+    --code-bg: #21262B; --flow-bg: #1E2327;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; font-size: 16px; line-height: 1.85; }
+  h1, h2, h3 { font-family: "Songti SC", "Noto Serif CJK SC", "SimSun", serif; text-wrap: balance; line-height: 1.4; }
+  .wrap { max-width: 52rem; margin: 0 auto; padding: 0 1.25rem 6rem; }
+  .topbar { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .topbar-inner { max-width: 52rem; margin: 0 auto; padding: 0.6rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .topbar .doc-tag { font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); }
+  .copy-btn { font: inherit; font-size: 0.85rem; background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 0.35rem 0.9rem; cursor: pointer; }
+  .copy-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .copy-btn.copied { background: var(--ok); }
+  header.doc-head { padding-top: 3rem; }
+  header.doc-head h1 { font-size: 1.85rem; margin: 0.2rem 0 0.8rem; }
+  .doc-date { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .howto { background: var(--accent-soft); border-radius: 10px; padding: 0.8rem 1.2rem; font-size: 0.92rem; }
+  nav.toc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.4rem; margin: 1.6rem 0; font-size: 0.92rem; }
+  nav.toc ol { margin: 0.3rem 0 0; padding-left: 1.4em; columns: 2; column-gap: 2rem; }
+  nav.toc li { margin: 0.15rem 0; break-inside: avoid; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  @media (max-width: 600px) { nav.toc ol { columns: 1; } }
+  section.block { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1.6rem 1.8rem 1.4rem; margin: 2.2rem 0; scroll-margin-top: 4rem; }
+  section.block h2 { font-size: 1.32rem; margin: 0 0 0.6rem; }
+  section.block h3 { font-size: 1.06rem; margin: 1.6rem 0 0.4rem; }
+  section.block p { margin: 0.45rem 0; }
+  section.block ul, section.block ol { margin: 0.45rem 0; padding-left: 1.4em; }
+  section.block li { margin: 0.3rem 0; }
+  .secnum { color: var(--muted); font-weight: 400; margin-right: 0.55em; font-variant-numeric: tabular-nums; }
+  .chip { display: inline-block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; border-radius: 999px; padding: 0.05rem 0.6rem; vertical-align: 0.15em; margin-left: 0.4rem; font-family: -apple-system, "PingFang SC", sans-serif; }
+  .chip.decided { background: var(--ok-bg); color: var(--ok); }
+  .chip.proposed { background: var(--accent-soft); color: var(--accent); }
+  .chip.open { background: var(--warn-bg); color: var(--warn); }
+  table { border-collapse: collapse; margin: 0.8rem 0; width: 100%; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--line); padding: 0.4rem 0.65rem; text-align: left; vertical-align: top; }
+  th { background: var(--accent-soft); font-weight: 600; }
+  td.num, th.num { font-variant-numeric: tabular-nums; }
+  .table-scroll { overflow-x: auto; }
+  pre.flow, pre.ir { background: var(--flow-bg); border: 1px solid var(--line); border-radius: 8px; padding: 0.9rem 1.1rem; overflow-x: auto; font-size: 0.86rem; line-height: 1.7; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  pre.ir { background: var(--code-bg); }
+  .nut { font: inherit; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; border-bottom: 1.5px dotted var(--accent); }
+  .nut:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .nut.open { border-bottom-style: solid; }
+  .nut-body { display: block; background: var(--nut-bg); border-left: 3px solid var(--nut-line); border-radius: 0 6px 6px 0; padding: 0.55rem 0.9rem; margin: 0.5rem 0; font-size: 0.92rem; }
+  .nut-body .nut-body { margin-left: 0.9rem; background: color-mix(in srgb, var(--nut-bg) 60%, var(--card)); }
+  .nut-dead { color: var(--muted); border-bottom: 1.5px dotted var(--muted); }
+  dl#glossary-list { margin: 0.8rem 0 0; }
+  dl#glossary-list dt { font-weight: 600; margin-top: 0.9rem; color: var(--accent); }
+  dl#glossary-list dd { margin: 0.15rem 0 0; font-size: 0.95rem; }
+  section.block .cost { border-top: 1px dashed var(--line); margin-top: 1.4rem; padding-top: 0.7rem; font-size: 0.92rem; }
+  section.block .cost strong { color: var(--warn); }
+  .note-box { margin-top: 1rem; border-top: 1px dashed var(--line); padding-top: 1rem; }
+  .note-box .note-title { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem; }
+  .verdicts { display: flex; gap: 0.5rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+  .v-btn { font: inherit; font-size: 0.85rem; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); padding: 0.25rem 0.95rem; cursor: pointer; }
+  .v-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .v-btn[data-v="accept"].on { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+  .v-btn[data-v="revise"].on { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
+  .v-btn[data-v="reject"].on { background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
+  .note-box textarea { width: 100%; min-height: 3rem; font: inherit; font-size: 0.92rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 0.5rem 0.7rem; resize: vertical; }
+  .note-box textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  a { color: var(--accent); }
+  footer.doc-foot { color: var(--muted); font-size: 0.88rem; margin-top: 3rem; }
+  @media (prefers-reduced-motion: no-preference) { .nut-body { animation: nutin 0.15s ease-out; } @keyframes nutin { from { opacity: 0; } to { opacity: 1; } } }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="topbar-inner"><span class="doc-tag">lumpy　音频资源审阅</span><button class="copy-btn" id="copyJson">复制批注 JSON</button></div></div>
+<div class="wrap">
+<header class="doc-head">
+  <div class="doc-date">2026-09-06　Review 稿 v1</div>
+  <h1>lumpy 音频资源审阅稿</h1>
+  <p>这份文档整理目前搜到的音频资源，供审阅者决定哪些来源值得继续试听和下载。当前的筛选政策是：只采用明确标注为 <button class="nut" data-term="CC0" aria-expanded="false">CC0</button> 的资源。文档中的“推荐”代表资源包方向，不代表已经选定了某一个具体音频文件。文中的 <button class="nut" data-term="SFX" aria-expanded="false">SFX</button> 和 <button class="nut" data-term="BGM" aria-expanded="false">BGM</button> 是按用途整理的类别。</p>
+  <p class="howto">阅读方式：带虚线下划线的词都能点，解释会在原处展开，解释里的词还能继续点。绿色角标表示已有明确结论，青色角标表示本稿提出的建议，黄色角标表示需要审阅者决定。每个审阅单元末尾都有批注栏，可以圈选“采纳”“要改”或“否决”并写意见。批注会保存在本机，阅读完成后点击右上角“复制批注 JSON”即可带走。</p>
+</header>
+<nav class="toc"><strong>目录</strong><ol>
+  <li><a href="#sec-conclusion">筛选结论</a></li>
+  <li><a href="#sec-cc0">已确认 CC0 资源包</a></li>
+  <li><a href="#sec-sfx">8 个 SFX 对应建议</a></li>
+  <li><a href="#sec-bgm">BGM 候选与缺口</a></li>
+  <li><a href="#sec-excluded">暂不采用的来源</a></li>
+  <li><a href="#sec-open">试听与定稿标准</a></li>
+  <li><a href="#sec-decisions">决策索引</a></li>
+  <li><a href="#sec-glossary">术语表</a></li>
+</ol></nav>
+
+<section class="block" id="sec-conclusion">
+  <h2><span class="secnum">1</span>筛选结论<span class="chip proposed">提议</span></h2>
+  <p><strong>现在是什么样：</strong>目前搜到的资源分为三类：Kenney 的音频包、OpenGameArt 的条目或资源包、以及 Pixabay 和 Mixkit 的平台授权资源。项目还没有下载音频，也没有建立音频目录或接入音频系统。</p>
+  <p><strong>为什么这是问题：</strong>如果只按名称或搜索结果决定资源，很容易把授权不清楚的音频带进项目，也容易在没有试听的情况下把“看起来适合”的资源误认为最终方案。</p>
+  <p><strong>改成什么：</strong>第一轮只从 Kenney 页面明确标注 CC0 的音频包，以及 OpenGameArt 页面明确标注 CC0 的条目中试听。具体文件仍需单独记录并试听；非 CC0 的 OpenGameArt、Pixabay 和 Mixkit 资源按当前政策暂不纳入。</p>
+  <p><strong>玩家会感觉到什么变化：</strong>玩家不会直接感知这条筛选规则，但后续加入的音效和音乐有明确来源记录，发布个人作品时更容易说明资源授权。</p>
+  <p class="cost"><strong>代价：</strong>BGM 可能暂时无法马上定稿，因为资源包页面只能确认来源和许可证，不能替代对具体曲目的试听。需要额外检查长度、情绪和循环衔接。</p>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="conclusion"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="筛选结论批注" placeholder="例如：接受 CC0 only；或允许某类其他授权……"></textarea></div>
+</section>
+
+<section class="block" id="sec-cc0">
+  <h2><span class="secnum">2</span>已确认 CC0 资源包<span class="chip proposed">来源已核验，尚待试听</span></h2>
+  <p><strong>现在是什么样：</strong>目前找到 7 个 Kenney 音频包。它们的官方页面都明确显示许可证为 Creative Commons CC0，并给出了文件数量；具体的 <button class="nut" data-term="单独文件" aria-expanded="false">单独文件</button>还没有选定或试听。</p>
+  <p><strong>为什么这是问题：</strong>资源包名称、标签和授权可以帮助缩小范围，但不能说明某个音效是否真的适合 lumpy 的卡通、轻松、弹性方向。现在只能确认“可以继续试听”，还不能确认“应该放进游戏”。</p>
+  <p><strong>改成什么：</strong>把下表作为第一轮 CC0 来源池。审阅者先决定哪些资源包值得试听，再从获准的资源包中记录具体文件名、来源链接和试听结论。</p>
+  <p><strong>玩家会感觉到什么变化：</strong>本阶段玩家还不会听到变化；它先保证候选资源的授权边界清楚，避免后续试听结果和来源记录混在一起。</p>
+  <p class="cost"><strong>代价：</strong>需要逐个试听具体文件，并记录哪些文件最终采用。来源页的数量和 CC0 标记已经核验，但声音风格、长度和循环适配性仍需人工判断。</p>
+  <div class="table-scroll"><table>
+    <tr><th>资源包</th><th class="num">文件数</th><th>官方页面标签</th><th>试听方向</th></tr>
+    <tr><td><a href="https://kenney.nl/assets/digital-audio" target="_blank" rel="noopener">Digital Audio</a><br><a href="https://kenney.nl/media/pages/assets/digital-audio/216eac4753-1677590265/kenney_digital-audio.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td class="num">60</td><td>space、laser</td><td>跳跃、吐球、吸球的备选；弹射感需要试听确认</td></tr>
+    <tr><td><a href="https://kenney.nl/assets/interface-sounds" target="_blank" rel="noopener">Interface Sounds</a><br><a href="https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td class="num">100</td><td>interface、click、button</td><td>按钮点击，菜单确认或取消</td></tr>
+    <tr><td><a href="https://kenney.nl/assets/impact-sounds" target="_blank" rel="noopener">Impact Sounds</a><br><a href="https://kenney.nl/media/pages/assets/impact-sounds/87b4ddecda-1677589768/kenney_impact-sounds.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td class="num">130</td><td>impact、foley</td><td>胶球停止、胶球获得、跳跃落地的备选</td></tr>
+    <tr><td><a href="https://kenney.nl/assets/music-jingles" target="_blank" rel="noopener">Music Jingles</a><br><a href="https://kenney.nl/media/pages/assets/music-jingles/f37e530b9e-1677590399/kenney_music-jingles.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td class="num">85</td><td>官方页面标签为 music、jingle；具体时长和循环适配性尚未核验</td><td>游戏结束提示，BGM 的临时试听来源</td></tr>
+    <tr><td><a href="https://kenney.nl/assets/rpg-audio" target="_blank" rel="noopener">RPG Audio</a><br><a href="https://kenney.nl/media/pages/assets/rpg-audio/8e99002d76-1677590336/kenney_rpg-audio.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td class="num">50</td><td>foley、rpg、footstep、weapon</td><td>移动、跳跃、游戏结束的备选</td></tr>
+    <tr><td><a href="https://kenney.nl/assets/casino-audio" target="_blank" rel="noopener">Casino Audio</a><br><a href="https://kenney.nl/media/pages/assets/casino-audio/2472606a04-1721639069/kenney_casino-audio.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td class="num">50</td><td>foley、casino、card、dice、chip</td><td>胶球增加、成功反馈、游戏结束的备选</td></tr>
+    <tr><td><a href="https://kenney.nl/assets/sci-fi-sounds" target="_blank" rel="noopener">Sci-fi Sounds</a><br><a href="https://kenney.nl/media/pages/assets/sci-fi-sounds/6b296f9ecf-1677589334/kenney_sci-fi-sounds.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td class="num">70</td><td>sci-fi、space、engine</td><td>吐球、吸球的备选；能量感需要试听确认</td></tr>
+  </table></div>
+  <p><strong>授权说明：</strong>CC0 允许复制、修改、发布和用于商业用途，通常不要求取得许可或署名。但 Creative Commons 也提醒，CC0 页面本身没有替使用者验证每一份作品的权利状态。因此实际使用时仍应保存来源页、下载时间和文件名，不要暗示作者或 Kenney 对项目作背书。授权原文见 <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0 1.0 Universal</a>。</p>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="cc0-packs"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="CC0 资源包批注" placeholder="请指出要保留、排除或优先试听的资源包……"></textarea></div>
+</section>
+
+<section class="block" id="sec-sfx">
+  <h2><span class="secnum">3</span>8 个 <button class="nut" data-term="SFX" aria-expanded="false">SFX</button> 对应建议<span class="chip proposed">待试听定稿</span></h2>
+  <p>本稿按 8 个音效事件整理：移动、跳跃、吐球、吸球、胶球增加、飞行胶球碰撞并停止、游戏结束、按钮点击。这里的 8 项是本次资源审阅采用的清单，不是 <code>docs/游戏设计稿.md</code> 中已经写明的 7 项需求；其中“游戏结束”和“按钮点击”目前属于未来场景或系统的音效需求。下表是试听顺序和风格方向，不是已经选定的文件名。</p>
+  <div class="table-scroll"><table>
+    <tr><th>事件</th><th>优先试听资源包</th><th>希望听到的感觉</th><th>当前结论</th></tr>
+    <tr><td>移动</td><td>RPG Audio<br>Digital Audio</td><td>短促、轻巧，不盖住跳跃和操作反馈。RPG Audio 页面包含 footstep 标签。</td><td>有合适方向，但尚未确认具体文件。</td></tr>
+    <tr><td>跳跃</td><td>Impact Sounds<br>Digital Audio</td><td>有弹性和上扬感，避免太重的撞击声。</td><td>建议先听 Impact Sounds，再听 Digital Audio。</td></tr>
+    <tr><td>吐球</td><td>Digital Audio<br>Sci-fi Sounds</td><td>短、快、带发射或弹射感。</td><td>建议优先找弹射声，不要求科幻风格。</td></tr>
+    <tr><td>吸球</td><td>Digital Audio<br>Sci-fi Sounds</td><td>由远到近的回收感，不能像持续的环境音。</td><td>需要试听确认是否有足够明显的吸入方向。</td></tr>
+    <tr><td>胶球增加</td><td>Casino Audio<br>Impact Sounds</td><td>轻量奖励反馈，不能像大型胜利结算。</td><td>建议从 Casino Audio 的确认或奖励方向寻找。</td></tr>
+    <tr><td>飞行胶球碰撞并停止</td><td>Impact Sounds</td><td>黏住或撞到墙面的短碰撞，不要过于坚硬或爆炸。</td><td>优先试听来源。</td></tr>
+    <tr><td>游戏结束</td><td>Music Jingles<br>Casino Audio<br>RPG Audio</td><td>能让玩家知道本次尝试结束，强度低于失败音乐。</td><td>项目目前还没有游戏结束流程，先保留试听方向。</td></tr>
+    <tr><td>按钮点击</td><td>Interface Sounds</td><td>清楚、短促、可重复播放。</td><td>优先试听来源。</td></tr>
+  </table></div>
+  <p><strong>试听优先级：</strong>建议先从 <a href="https://kenney.nl/assets/interface-sounds" target="_blank" rel="noopener">Interface Sounds</a>、<a href="https://kenney.nl/assets/impact-sounds" target="_blank" rel="noopener">Impact Sounds</a> 和 <a href="https://kenney.nl/assets/rpg-audio" target="_blank" rel="noopener">RPG Audio</a> 中各挑少量具体文件供审阅，再决定是否继续下载其他资源包。这个顺序只是减少初轮试听量，不表示三包已经覆盖全部需求。</p>
+  <h3>OpenGameArt 音效条目</h3>
+  <p>下表是之前找到的 OpenGameArt 音效条目。页面许可证已经核验；只有标为 CC0 的条目符合当前筛选政策，其他条目保留为已查看记录，不作为本轮推荐。</p>
+  <div class="table-scroll"><table>
+    <tr><th>条目</th><th>页面标签或内容</th><th>页面许可证</th><th>当前处理</th></tr>
+    <tr><td><a href="https://opengameart.org/content/8-bit-platformer-sfx" target="_blank" rel="noopener">8-bit Platformer SFX</a><br><a href="https://opengameart.org/sites/default/files/bfxr_sounds.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>12 个复古平台跳跃音效，含 jump、powerup、UI blip 等</td><td>CC-BY 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/12-player-movement-sfx" target="_blank" rel="noopener">12 Player Movement SFX</a><br><a href="https://opengameart.org/sites/default/files/player_movement_samples.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>脚步、跳跃、落地、攻击、受击等 12 个移动音效</td><td>CC-BY 4.0；CC-BY 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/cartoony-jump-and-bounce" target="_blank" rel="noopener">Cartoony Jump and Bounce</a><br><a href="https://opengameart.org/sites/default/files/apricotjumpbounce-jump.ogg" target="_blank" rel="noopener">jump.ogg</a></td><td>卡通、可爱、bounce、trampoline；2 个音效</td><td>CC-BY 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/funny-comic-cartoon-bounce-sound" target="_blank" rel="noopener">Funny Comic Cartoon Bounce Sound</a><br><a href="https://opengameart.org/sites/default/files/BounceYoFrankie.flac" target="_blank" rel="noopener">下载 FLAC</a></td><td>卡通、comic、joyful、bounce</td><td>CC-BY 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/40-cc0-water-splash-slime-sfx" target="_blank" rel="noopener">40 CC0 Water / Splash / Slime SFX</a><br><a href="https://opengameart.org/sites/default/files/water-splash-slime-sfx.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>3 bubble、6 loop、16 slime、15 splash</td><td>CC0</td><td>保留为吐球、吸球、胶球相关音效候选</td></tr>
+    <tr><td><a href="https://opengameart.org/content/80-cc0-rpg-sfx" target="_blank" rel="noopener">80 CC0 RPG SFX</a><br><a href="https://opengameart.org/sites/default/files/80-CC0-RPG-SFX_0.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>slime、item、coin、stone、wood 等 80 个音效</td><td>CC0</td><td>保留为胶球增加、碰撞、游戏结束候选</td></tr>
+    <tr><td><a href="https://opengameart.org/content/80-cc0-creture-sfx-2" target="_blank" rel="noopener">80 CC0 Creature SFX #2</a><br><a href="https://opengameart.org/sites/default/files/80-CC0-creature-sfx-2.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>slime、misc、die、stomp 等 80 个生物音效</td><td>CC0</td><td>保留为卡通动作和游戏结束候选</td></tr>
+    <tr><td><a href="https://opengameart.org/content/menu-selection-click" target="_blank" rel="noopener">Menu Selection Click</a><br><a href="https://opengameart.org/sites/default/files/Menu%20Selection%20Click.wav" target="_blank" rel="noopener">下载 WAV</a></td><td>清脆、subtle、menu、selection click</td><td>CC-BY 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/oldschool-win-and-die-jump-and-run-sounds" target="_blank" rel="noopener">Oldschool Win and Die Jump and Run Sounds</a><br><a href="https://opengameart.org/sites/default/files/vsgame_0.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>2 个音效，页面标签含 win、lose、death、game over</td><td>CC0</td><td>保留为游戏结束候选</td></tr>
+    <tr><td><a href="https://opengameart.org/content/8-bit-jump-1" target="_blank" rel="noopener">8-BIT Jump #1</a><br><a href="https://opengameart.org/sites/default/files/8_BIT_%5B50_SFX%5D_Jump_Free_Sound_Effects_N1_BY_jalastram.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>50 个 8-bit jump 音效</td><td>CC0</td><td>保留为跳跃候选</td></tr>
+    <tr><td><a href="https://opengameart.org/content/slime-jump-effect" target="_blank" rel="noopener">Slime Jump Effect</a><br><a href="https://opengameart.org/sites/default/files/slime_jump.wav" target="_blank" rel="noopener">下载 WAV</a></td><td>slime、jump、splash、gloop；页面说明可作通用跳跃声</td><td>CC0</td><td>优先保留为跳跃候选</td></tr>
+    <tr><td><a href="https://opengameart.org/content/25-cc0-mud-sfx" target="_blank" rel="noopener">25 CC0 Mud SFX</a><br><a href="https://opengameart.org/sites/default/files/25-CC0-mud-sfx.zip" target="_blank" rel="noopener">下载 ZIP</a></td><td>mud、slime、wet、squish</td><td>CC0</td><td>保留为胶球和黏液反馈候选</td></tr>
+  </table></div>
+  <p><strong>补充记录：</strong><a href="https://opengameart.org/content/cc0-sound-effects" target="_blank" rel="noopener">OpenGameArt 的 CC0 Sound Effects 集合页</a>是一个集合索引，不是单个音频文件的授权证明。使用其中的条目时，仍要回到具体条目页面核对许可证。</p>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="sfx-mapping"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="SFX 对应建议批注" placeholder="请指出哪些事件应该换资源包、合并声音或取消独立音效……"></textarea></div>
+</section>
+
+<section class="block" id="sec-bgm">
+  <h2><span class="secnum">4</span>BGM 候选与缺口<span class="chip open">开放</span></h2>
+  <p><strong>现在是什么样：</strong>本次资源任务按“开始界面一首、正式游戏界面一首”的两个 BGM 候选槽位整理；这是本次任务的整理口径，不是 <code>docs/游戏设计稿.md</code> 已经写明的两项要求。当前项目的主场景是 <code>res://scenes/levels/player_test.tscn</code>，尚未发现开始界面场景。已确认 CC0 的 Kenney <a href="https://kenney.nl/assets/music-jingles" target="_blank" rel="noopener">Music Jingles</a> 包含 85 个、页面标签为 music/jingle 的文件，但具体时长和循环适配性尚未核验。</p>
+  <p><strong>为什么这是问题：</strong>如果把短提示片段直接当作 BGM，可能出现播放时间太短、循环突兀或音乐情绪不够稳定的问题。目前没有任何一首具体曲目完成试听、循环检查和项目内测试。</p>
+  <p><strong>改成什么：</strong>优先试听明确标为 CC0 的 OpenGameArt 条目，再试听 Kenney Music Jingles。具体曲目选定前，记录文件名、作者、来源页、页面许可证、下载地址和循环结论；非 CC0 条目不进入当前清单。</p>
+  <p><strong>玩家会感觉到什么变化：</strong>如果最终找到两首适合的曲目，开始界面和正式游戏可以有不同的情绪标识，而不是使用一段很快结束的提示音乐。</p>
+  <p class="cost"><strong>代价：</strong>BGM 需要单独试听循环点、长度和情绪，筛选时间会比按钮音效和碰撞音效更长。若 CC0 候选不足，需要继续扩大搜索范围，不能直接用授权未确认的曲目代替。</p>
+  <h3>OpenGameArt 音乐条目</h3>
+  <div class="table-scroll"><table>
+    <tr><th>条目</th><th>文件或内容</th><th>页面许可证</th><th>当前处理</th></tr>
+    <tr><td><a href="https://opengameart.org/content/platformer-game-music-pack" target="_blank" rel="noopener">Platformer Game Music Pack</a></td><td>Intro、Worldmap、Grasslands、Boss、Desert、Dungeon、Iceland、Mushroom 共 8 首 MP3</td><td>CC-BY 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/platformer-music" target="_blank" rel="noopener">Platformer Music</a></td><td><a href="https://opengameart.org/sites/default/files/lsc_title.mp3" target="_blank" rel="noopener">lsc_title.mp3</a>、<a href="https://opengameart.org/sites/default/files/lsc_ingame.mp3" target="_blank" rel="noopener">lsc_ingame.mp3</a>、lsc_boss.mp3</td><td>CC0</td><td>优先试听 title 和 ingame</td></tr>
+    <tr><td><a href="https://opengameart.org/content/basic-platformer-music" target="_blank" rel="noopener">Basic Platformer Music</a></td><td>title、world 1/2/3；页面标签含 loopable、intro</td><td>CC-BY 4.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/two-platformer-game-music" target="_blank" rel="noopener">Two Platformer Game Music</a></td><td><a href="https://opengameart.org/sites/default/files/song1_0.mp3" target="_blank" rel="noopener">song1.mp3</a>、<a href="https://opengameart.org/sites/default/files/song2_0.mp3" target="_blank" rel="noopener">song2.mp3</a>；页面标签含 fun、funny、playful</td><td>CC0</td><td>优先试听，可能直接对应两个候选槽位</td></tr>
+    <tr><td><a href="https://opengameart.org/content/a-platformer-theme" target="_blank" rel="noopener">A Platformer Theme</a></td><td><a href="https://opengameart.org/sites/default/files/new_song_0.mp3" target="_blank" rel="noopener">new_song.mp3</a>；页面标签含 classic</td><td>CC0</td><td>保留为单曲候选</td></tr>
+    <tr><td><a href="https://opengameart.org/content/happy-arcade-tune" target="_blank" rel="noopener">Happy Arcade Tune</a></td><td><a href="https://opengameart.org/sites/default/files/happy_0.mp3" target="_blank" rel="noopener">happy.mp3</a>；页面说明为 cheerful arcade tune</td><td>CC-BY 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/happy-adventure-loop" target="_blank" rel="noopener">Happy Adventure Loop</a></td><td><a href="https://opengameart.org/sites/default/files/happy_adveture.mp3" target="_blank" rel="noopener">happy_adveture.mp3</a>；页面标签含 happy、fun、light、8-bit、chiptune</td><td>CC0</td><td>保留为正式游戏 BGM 候选；页面评论提示 MP3 可能有静音间隔，需试听循环</td></tr>
+    <tr><td><a href="https://opengameart.org/content/cheerful-upbeat-tune" target="_blank" rel="noopener">Cheerful Upbeat Tune</a></td><td>页面提供带 intro 和 loop 的压缩包；标签含 cheerful、upbeat、cartoon、kid</td><td>CC-BY-SA 3.0</td><td>非 CC0，暂不采用</td></tr>
+    <tr><td><a href="https://opengameart.org/content/penguin-dance" target="_blank" rel="noopener">Penguin Dance</a></td><td><a href="https://opengameart.org/sites/default/files/penguin_dance.mp3" target="_blank" rel="noopener">penguin_dance.mp3</a>；页面说明适合 cartoon game 或 menu</td><td>GPL 3.0</td><td>非 CC0，暂不采用</td></tr>
+  </table></div>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="bgm-gap"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="BGM 候选批注" placeholder="请决定：先试听 Kenney，还是优先核验 OpenGameArt；是否必须要可循环的完整曲目……"></textarea></div>
+</section>
+
+<section class="block" id="sec-excluded">
+  <h2><span class="secnum">5</span>暂不采用的来源<span class="chip proposed">提议：按 CC0 政策排除</span></h2>
+  <p>以下资源之前已经找到，但都不属于明确 CC0。它们保留在文档中，是为了让后续审阅者知道哪些来源已经看过，也方便未来若调整授权政策时重新评估。</p>
+  <h3>Pixabay</h3>
+  <p>Pixabay 使用自己的 Content License，不是 CC0。按照当前筛选政策，以下资源不进入本轮：</p>
+  <ul>
+    <li><a href="https://pixabay.com/music/main-title-friendly-town-fun-video-game-music-loop-256055/" target="_blank" rel="noopener">Friendly Town – Fun Video Game Music Loop</a></li>
+    <li><a href="https://pixabay.com/music/pop-classic-platformer-music-398932/" target="_blank" rel="noopener">Classic Platformer Music</a></li>
+    <li><a href="https://pixabay.com/music/video-games-jump-and-run-game-backround-music-326882/" target="_blank" rel="noopener">Jump and Run game backround music</a></li>
+    <li><a href="https://pixabay.com/music/upbeat-playful-game-adventure-430153/" target="_blank" rel="noopener">Playful Game Adventure</a></li>
+    <li><a href="https://pixabay.com/sound-effects/film-special-effects-cartoon-jump-463196/" target="_blank" rel="noopener">Cartoon Jump</a></li>
+  </ul>
+  <p>授权说明：<a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noopener">Pixabay Content License Summary</a>。</p>
+  <h3>Mixkit</h3>
+  <p>目前只查到 <a href="https://mixkit.co/license/" target="_blank" rel="noopener">Mixkit License</a> 页面，没有确定具体采用的音频文件。由于本稿只允许明确 CC0，Mixkit 本轮不作为推荐来源。</p>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="excluded-sources"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="排除来源批注" placeholder="如果允许其他授权，请写明接受哪些授权条件……"></textarea></div>
+</section>
+
+<section class="block" id="sec-open">
+  <h2><span class="secnum">6</span>试听与定稿标准<span class="chip open">开放</span></h2>
+  <p>本节的三个问题决定试听时按什么标准挑选资源。它们不改变资源来源清单，只影响具体文件的选择条件；每个问题都可单独拍板。</p>
+  <h3>标准一：BGM 是否要求可循环的完整曲目？</h3>
+  <p>如果要求可循环，OpenGameArt 中标为 CC0 的平台跳跃曲目优先试听，Kenney Music Jingles 只能作为临时补充。若允许短片段，Music Jingles 可能够用，但正式游戏的长时间 BGM 仍不建议用短片段凑数。</p>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="open-bgm-loop"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="BGM 循环要求批注" placeholder="请写明：必须可循环，或接受短音乐片段……"></textarea></div>
+  <h3>标准二：移动音效按一次反馈还是持续节奏来试听？</h3>
+  <p>如果每次开始移动只播放一次，RPG Audio 的 footstep 方向可以作为候选。如果希望移动时持续有节奏，则需要筛选适合短间隔重复的轻声音效。</p>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="open-movement"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="移动音效批注" placeholder="请决定移动音效播放一次，还是持续重复……"></textarea></div>
+  <h3>标准三：是否要为游戏结束准备独立音效？</h3>
+  <p>当前项目还没有游戏结束流程，本节先决定要不要为此准备资源。若游戏结束会切换 BGM 或静音，可以不需要独立 SFX；若需要即时提示，则保留 Music Jingles、Casino Audio 或 RPG Audio 的候选。</p>
+  <div class="note-box"><div class="note-title">批注</div><div class="verdicts" data-id="open-game-over"><button class="v-btn" data-v="accept">采纳</button><button class="v-btn" data-v="revise">要改</button><button class="v-btn" data-v="reject">否决</button></div><textarea aria-label="游戏结束音效批注" placeholder="请决定是否需要独立游戏结束音效……"></textarea></div>
+</section>
+
+<section class="block" id="sec-decisions">
+  <h2><span class="secnum">7</span>决策索引<span class="chip proposed">待审阅</span></h2>
+  <p>本稿是资源调查和初步筛选，不代表已经完成资源定稿。审阅意见应以本页批注 JSON 为准，后续再整理为正式的资源清单和下载记录。</p>
+  <div class="table-scroll"><table>
+    <tr><th>决策内容</th><th>落在本页哪一节</th><th>依据出处</th></tr>
+    <tr><td>本轮只采用明确标注 CC0 的资源</td><td>§1、§5</td><td>本次对话口头拍板，2026-09-06，请复核</td></tr>
+    <tr><td>按 8 个 SFX 事件整理，而不是按“7 种”整理</td><td>§3</td><td>本次对话口头拍板，2026-09-06，请复核</td></tr>
+    <tr><td>Kenney 的 7 个音频包作为第一轮试听来源池</td><td>§2、§3</td><td>Kenney 官方资源页面，链接见 §2；具体取舍待本页批注</td></tr>
+    <tr><td>OpenGameArt 条目按页面许可证筛选，非 CC0 暂不采用</td><td>§3、§4</td><td>OpenGameArt 条目页面许可证，链接见 §3、§4；请复核</td></tr>
+    <tr><td>Pixabay 和 Mixkit 暂不纳入 CC0 资源清单</td><td>§5</td><td>各平台授权页，链接见 §5</td></tr>
+  </table></div>
+</section>
+
+<section class="block" id="sec-glossary">
+  <h2><span class="secnum">8</span>术语表</h2>
+  <p>由中央词典自动生成，与正文中点开的解释使用同一份内容。</p>
+  <dl id="glossary-list"></dl>
+</section>
+
+<footer class="doc-foot">
+  <p>本稿依据：lumpy 当前项目文件、<code>docs/游戏设计稿.md</code> 的音频需求、Kenney 官方资源页面、Creative Commons CC0 页面、OpenGameArt 候选页面、Pixabay 授权摘要和 Mixkit 授权页面。本文档只记录目前发现的资源，不包含下载文件或项目改动。审阅完成后点击右上角复制批注 JSON，并将结果发回，以便整理下一版资源清单。</p>
+</footer>
+</div>
+<script>
+(function () {
+  var NUTS = {
+    'CC0': 'Creative Commons Zero，一种将作品尽可能放入公共领域的授权方式。通常允许复制、修改、发布和商业使用，不要求取得许可或署名，但使用者仍应保留来源记录，也不能暗示作者为项目背书。',
+    'SFX': 'Sound Effects 的缩写，指游戏中的动作、碰撞、按钮和反馈音效。',
+    'BGM': 'Background Music 的缩写，指场景或界面持续播放的背景音乐。',
+    '候选': '已经找到并认为方向可能合适，但还没有完成试听、授权或项目内测试的资源。',
+    '循环': '音频播放到结尾后重新从指定位置开始，要求衔接处听起来不会突然跳变。',
+    '单独文件': '资源包中的某一个具体音频文件。资源包页面的授权标记不能替代对文件名称、版本和来源的记录。'
+  };
+  function nutExpandHtml(def) {
+    return def.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, function (m, t, d) {
+      d = d || t;
+      if (!NUTS[t]) { console.warn('[nut] 未注册术语:', t); return d; }
+      return '<button class="nut" data-term="' + t + '" aria-expanded="false">' + d + '</button>';
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.nut');
+    if (!btn) return;
+    if (btn.classList.contains('open')) {
+      var body = btn.nextElementSibling;
+      if (body && body.classList.contains('nut-body')) body.remove();
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      return;
+    }
+    var term = btn.getAttribute('data-term');
+    var def = NUTS[term];
+    if (!def) return;
+    var seen = {}; seen[term] = true;
+    var p = btn.parentElement;
+    while (p) {
+      if (p.classList && p.classList.contains('nut-body') && p.getAttribute('data-term')) seen[p.getAttribute('data-term')] = true;
+      p = p.parentElement;
+    }
+    var span = document.createElement('span');
+    span.className = 'nut-body'; span.setAttribute('data-term', term); span.innerHTML = nutExpandHtml(def);
+    span.querySelectorAll('.nut').forEach(function (b) {
+      if (seen[b.getAttribute('data-term')]) { var s = document.createElement('span'); s.className = 'nut-dead'; s.textContent = b.textContent; b.replaceWith(s); }
+    });
+    btn.after(span); btn.classList.add('open'); btn.setAttribute('aria-expanded', 'true');
+  });
+  (function buildGlossary() {
+    var dl = document.getElementById('glossary-list'); if (!dl) return;
+    Object.keys(NUTS).forEach(function (term) { var dt = document.createElement('dt'); dt.textContent = term; var dd = document.createElement('dd'); dd.innerHTML = nutExpandHtml(NUTS[term]); dl.appendChild(dt); dl.appendChild(dd); });
+  })();
+  var STORE_KEY = location.pathname + '#notes';
+  function loadStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } }
+  function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+  var store = loadStore();
+  function noteBoxes() { return Array.prototype.slice.call(document.querySelectorAll('.note-box')); }
+  function boxId(box) { var g = box.querySelector('.verdicts'); return g && g.getAttribute('data-id') ? g.getAttribute('data-id') : ''; }
+  function headingText(h) { var clone = h.cloneNode(true); clone.querySelectorAll('.chip, .secnum').forEach(function (c) { c.remove(); }); return clone.textContent.trim(); }
+  function boxTitle(box) {
+    var el = box;
+    while (el && !(el.classList && el.classList.contains('wrap'))) {
+      var sib = el.previousElementSibling;
+      while (sib) { if (/^H[234]$/.test(sib.tagName)) return headingText(sib); var inner = sib.querySelectorAll ? sib.querySelectorAll('h2, h3, h4') : []; if (inner.length) return headingText(inner[inner.length - 1]); sib = sib.previousElementSibling; }
+      el = el.parentElement;
+    }
+    return boxId(box);
+  }
+  noteBoxes().forEach(function (box) {
+    var id = boxId(box), saved = store[id] || {}, ta = box.querySelector('textarea');
+    if (ta) { if (saved.note) ta.value = saved.note; ta.addEventListener('input', function () { store[id] = store[id] || {}; store[id].note = ta.value; saveStore(store); }); }
+    var group = box.querySelector('.verdicts');
+    if (group) group.querySelectorAll('.v-btn').forEach(function (btn) {
+      var isSaved = saved.verdict === btn.getAttribute('data-v'); btn.setAttribute('aria-pressed', isSaved ? 'true' : 'false'); if (isSaved) btn.classList.add('on');
+      btn.addEventListener('click', function () { var wasOn = btn.classList.contains('on'); group.querySelectorAll('.v-btn').forEach(function (b) { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }); if (!wasOn) { btn.classList.add('on'); btn.setAttribute('aria-pressed', 'true'); } store[id] = store[id] || {}; store[id].verdict = wasOn ? '' : btn.getAttribute('data-v'); saveStore(store); });
+    });
+  });
+  document.getElementById('copyJson').addEventListener('click', function () {
+    var notes = noteBoxes().map(function (box) { var group = box.querySelector('.verdicts'), on = group ? group.querySelector('.v-btn.on') : null, ta = box.querySelector('textarea'); return { id: boxId(box), title: boxTitle(box), verdict: on ? on.getAttribute('data-v') : '', note: ta ? ta.value.trim() : '' }; });
+    var payload = JSON.stringify({ notes: notes }, null, 2), btn = document.getElementById('copyJson');
+    function done() { btn.classList.add('copied'); btn.textContent = '已复制'; setTimeout(function () { btn.classList.remove('copied'); btn.textContent = '复制批注 JSON'; }, 1600); }
+    function showManual() { var v = document.createElement('textarea'); v.value = payload; v.setAttribute('aria-label', '批注 JSON，请手动复制'); v.style.cssText = 'position:fixed;left:1rem;right:1rem;bottom:1rem;height:8rem;z-index:99;background:var(--card);color:var(--ink);border:2px solid var(--accent);border-radius:8px;padding:0.6rem;font:inherit;font-size:0.85rem;'; document.body.appendChild(v); v.focus(); v.select(); btn.textContent = '自动复制失败，请在下方手动复制'; v.addEventListener('blur', function () { v.remove(); btn.textContent = '复制批注 JSON'; }); }
+    function fallback() { var t = document.createElement('textarea'); t.value = payload; t.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;'; document.body.appendChild(t); t.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; } document.body.removeChild(t); if (ok) done(); else showManual(); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(payload).then(done, fallback); else fallback();
+  });
+})();
+</script>
+</body>
+</html>

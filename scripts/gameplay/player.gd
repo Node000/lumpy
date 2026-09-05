@@ -16,7 +16,6 @@ const LAYER_PLAYER := 16
 
 @onready var _collision: CollisionShape2D = get_node_or_null("Collision") as CollisionShape2D
 @onready var _blob: BlobBackdrop = get_node_or_null("VisualBlob") as BlobBackdrop
-@onready var _camera: Camera2D = get_node_or_null("Camera2D") as Camera2D
 @onready var _animated_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 
 var glue_count: int = 0
@@ -51,13 +50,14 @@ func _ready() -> void:
 	collision_layer = LAYER_PLAYER
 	collision_mask = LAYER_ROUGH | LAYER_SMOOTH | LAYER_GLUE_REST | LAYER_PLAYER
 	glue_count = GameTuning.start_glue
+	if _blob != null:
+		_blob.layout_changed.connect(_on_blob_layout_changed)
 	_update_body_radius()
 	if _blob != null:
 		_blob.set_bottom_anchor(GameTuning.player_collection_bottom_y)
 		_blob.set_glue_count(glue_count)
 		_blob.set_glue_color(GameTuning.player_body_color)
-	if _camera != null:
-		_camera.make_current()
+	_sync_particle_collisions()
 	if _animated_sprite != null:
 		_animated_sprite.play("idle")
 	GameplayEvents.emit_glue_changed(glue_count, GameTuning.max_glue)
@@ -68,6 +68,7 @@ func set_glue_count(n: int) -> void:
 	_update_body_radius()
 	if _blob != null:
 		_blob.set_glue_count(glue_count)
+	_sync_particle_collisions()
 	GameplayEvents.emit_glue_changed(glue_count, GameTuning.max_glue)
 
 
@@ -132,18 +133,16 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("restart_level"):
 		get_tree().reload_current_scene()
 
-	if Input.is_action_pressed("suck_glue") or Input.is_action_just_pressed("spit_glue"):
+	if Input.is_action_pressed("suck_glue") or Input.is_action_pressed("spit_glue"):
 		var to_mouse := get_global_mouse_position() - global_position
 		if to_mouse.length_squared() > 1.0:
 			_aim_dir = to_mouse.normalized()
-	if Input.is_action_just_pressed("spit_glue"):
+	if Input.is_action_pressed("spit_glue"):
 		_spit()
 	if Input.is_action_pressed("suck_glue"):
 		_try_suck()
 	if _animated_sprite != null:
 		_animated_sprite.flip_h = facing < 0
-	if _blob != null:
-		_blob.set_velocity(velocity)
 	_update_animation()
 
 	queue_redraw()
@@ -160,63 +159,92 @@ func _do_jump() -> void:
 
 
 func _update_body_radius() -> void:
-	var r := minf(GameTuning.body_radius_base + GameTuning.body_radius_per_glue * float(glue_count), GameTuning.body_collision_max_radius)
-	if _collision != null and _collision.shape is CircleShape2D:
-		(_collision.shape as CircleShape2D).radius = r
-		# Anchor the collision bottom at the feet: as the radius grows the
-		# shape slides upward instead of pushing the player up off the ground.
-		_collision.position.y = GameTuning.body_collision_bottom_offset - r
 	if _blob != null:
 		var collection_radius := GameTuning.player_collection_radius_base + GameTuning.player_collection_radius_per_glue * float(glue_count)
 		_blob.set_collection_radius(minf(collection_radius, GameTuning.player_collection_max_radius))
 
 
+func _on_blob_layout_changed(_positions: PackedVector2Array, _radii: PackedFloat32Array) -> void:
+	_sync_particle_collisions()
+
+
+func _sync_particle_collisions() -> void:
+	if _blob == null:
+		return
+	# Fixed body collider: keeps the player grounded even at zero glue.
+	if _collision == null:
+		_collision = CollisionShape2D.new()
+		_collision.name = "Collision"
+		add_child(_collision)
+	_collision.position = _blob.position
+	var body_circle := _collision.shape as CircleShape2D
+	if body_circle == null:
+		body_circle = CircleShape2D.new()
+		_collision.shape = body_circle
+	body_circle.radius = GameTuning.body_radius_base
+	_collision.set_deferred("disabled", false)
+	var layout: Dictionary = _blob.get_particle_layout()
+	var positions: PackedVector2Array = layout["positions"]
+	var radii: PackedFloat32Array = layout["radii"]
+	for i in positions.size():
+		var shape_node := _get_or_create_particle_collision(i)
+		shape_node.position = _blob.position + positions[i]
+		var circle := shape_node.shape as CircleShape2D
+		circle.radius = radii[i]
+		shape_node.set_deferred("disabled", false)
+	for i in range(positions.size(), _collision_count()):
+		var extra := get_node_or_null("ParticleCollision%03d" % (i + 1)) as CollisionShape2D
+		if extra != null:
+			extra.set_deferred("disabled", true)
+
+
+func get_active_particle_collision_count() -> int:
+	if _blob == null:
+		return 0
+	return _blob.get_particle_count()
+
+
+func _get_or_create_particle_collision(index: int) -> CollisionShape2D:
+	var node_name := "ParticleCollision%03d" % (index + 1)
+	var shape_node := get_node_or_null(node_name) as CollisionShape2D
+	if shape_node == null:
+		shape_node = CollisionShape2D.new()
+		shape_node.name = node_name
+		add_child(shape_node)
+	if shape_node.shape == null or not shape_node.shape is CircleShape2D:
+		shape_node.shape = CircleShape2D.new()
+	return shape_node
+
+
+func _collision_count() -> int:
+	var count := 0
+	for child in get_children():
+		if child is CollisionShape2D and child != _collision:
+			count += 1
+	return count
+
+
 func _spit() -> void:
 	if _spit_cooldown_timer > 0.0:
 		return
-	if glue_count < GameTuning.glue_particles_per_unit:
+	if glue_count <= 0:
 		return
-	_spit_cooldown_timer = GameTuning.spit_cooldown
+	var ball: Node = GluePool.take_ball()
+	if ball == null:
+		return
+	_spit_cooldown_timer = GameTuning.spit_interval
 	_play_action_animation("spit", 0.30)
-	set_glue_count(glue_count - GameTuning.glue_particles_per_unit)
-	var dir := _aim_dir
 	var r: float = _current_radius()
+	set_glue_count(glue_count - 1)
+	var half_spread := deg_to_rad(GameTuning.spit_spread_deg * 0.5)
+	var dir := _aim_dir.rotated(randf_range(-half_spread, half_spread))
 	var muzzle := global_position + dir * (r + GameTuning.glue_ball_radius + 3.0)
-	var n := GameTuning.glue_particles_per_unit
-	# One spit fires one burst. Members keep INDEPENDENT physics (separate
-	# flight, separate landing) but share a burst id so they never shove each
-	# other apart mid-air or at impact. The layout is a disc PERPENDICULAR to
-	# the aim direction, so every ball has the same flight depth: the whole
-	# burst reaches the wall on the same frame and lands as one bump.
-	var bid := 1 + int(Time.get_ticks_usec() % 1000000000)
-	var fired := 0
-	for i in n:
-		var ball: Node = GluePool.take_ball()
-		if ball == null:
-			continue
-		ball.set("burst_id", bid)
-		var offset := _burst_offset(i, n, dir)
-		var drift := 1.0 + (fposmod(float(i) * 0.618, 1.0) - 0.5) * 0.016
-		ball.call("begin_fly", muzzle + offset, dir, GameTuning.spit_speed * drift)
-		fired += 1
-	if fired == 0:
-		set_glue_count(glue_count + GameTuning.glue_particles_per_unit)
-
-
-func _burst_offset(i: int, n: int, _dir: Vector2) -> Vector2:
-	# Full golden-angle disc. Slight depth spread is fine: same-burst members
-	# pass through each other in flight (burst_id probe) and reach the wall
-	# themselves, so the clump reads as one big ball mid-air and lands as a
-	# pile where later balls settle on/behind earlier ones -- never a line.
-	if i == 0:
-		return Vector2.ZERO
-	var golden := float(i) * 2.39996
-	var ring := 12.0 * sqrt(float(i) / float(n - 1))
-	return Vector2(cos(golden), sin(golden)) * ring
+	ball.call("begin_fly", muzzle, dir, GameTuning.spit_speed)
 
 
 func _current_radius() -> float:
-	return GameTuning.body_radius_base + GameTuning.body_radius_per_glue * float(glue_count)
+	var collection_radius := GameTuning.player_collection_radius_base + GameTuning.player_collection_radius_per_glue * float(glue_count)
+	return minf(collection_radius, GameTuning.player_collection_max_radius)
 
 
 func _try_suck() -> void:
@@ -250,8 +278,6 @@ func _try_suck() -> void:
 		var half := cos(deg_to_rad(GameTuning.suck_cone_angle_deg * 0.5))
 		if dot < half:
 			continue
-		if not _los_clear(ball):
-			continue
 		owned.append(ball)
 		if owned.size() >= GameTuning.max_suck_glue:
 			break
@@ -259,20 +285,8 @@ func _try_suck() -> void:
 		b.begin_suck(self)
 		_pending_suck.append(b)
 
-
-func _los_clear(ball: Node) -> bool:
-	var space := get_world_2d().direct_space_state
-	var r: float = _current_radius()
-	var from := global_position + _aim_dir * (r - 2.0)
-	var ray := PhysicsRayQueryParameters2D.create(from, ball.global_position, LAYER_ROUGH | LAYER_SMOOTH | LAYER_GLUE_REST)
-	ray.exclude = [get_rid(), ball.get_rid()]
-	var hit := space.intersect_ray(ray)
-	return hit.is_empty()
-
-
 func _draw() -> void:
-	# suck cone visual aid while holding
-	if Input.is_action_pressed("suck_glue"):
+	if GameTuning.show_suck_range and Input.is_action_pressed("suck_glue"):
 		_draw_suck_cone()
 
 

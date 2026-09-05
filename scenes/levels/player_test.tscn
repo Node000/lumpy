@@ -6,7 +6,22 @@
 [ext_resource type="SpriteFrames" uid="uid://bsbtryl4v8v8n" path="res://assets/character/lumpy_animations.tres" id="4_p5qbh"]
 [ext_resource type="Script" uid="uid://x7756bwqmrgc" path="res://scripts/gameplay/level_hud.gd" id="7_2blty"]
 [ext_resource type="Script" uid="uid://c41i0hd8ph11c" path="res://scripts/gameplay/glue_spot.gd" id="8_f482d"]
-[ext_resource type="Texture2D" uid="uid://c20t1iunhoa6i" path="res://design/level2final22.png" id="20_bu2lm"]
+[ext_resource type="Texture2D" uid="uid://dwrqhsd4ddj3j" path="res://design/char.png" id="8_bvm0p"]
+[ext_resource type="Texture2D" uid="uid://bevvhvyg30r5d" path="res://design/level.png" id="9_f482d"]
+[ext_resource type="Texture2D" uid="uid://06ehfwrq2kqq" path="res://design/level2.png" id="10_bu2lm"]
+[ext_resource type="Texture2D" uid="uid://b3s3x1tj8n0pp" path="res://design/level3.png" id="11_drc7l"]
+[ext_resource type="Texture2D" uid="uid://bib47bch07uh7" path="res://design/level5.png" id="12_b0qq3"]
+[ext_resource type="Texture2D" uid="uid://cf4cxq8g42or1" path="res://design/level6.png" id="13_jbuld"]
+[ext_resource type="Texture2D" uid="uid://dgm1uietkphrv" path="res://design/level7.png" id="14_n4o2o"]
+[ext_resource type="Texture2D" uid="uid://flmm12jt1qaq" path="res://design/level8.png" id="15_vrg02"]
+[ext_resource type="Texture2D" uid="uid://b5vf3q8ifpr37" path="res://design/level9.png" id="16_v27ed"]
+[ext_resource type="Texture2D" uid="uid://o2h17olo1nje" path="res://design/level10.png" id="17_diyin"]
+[ext_resource type="Texture2D" uid="uid://cokgo542md74f" path="res://design/level11.png" id="18_wnq7u"]
+[ext_resource type="Texture2D" uid="uid://dq8vofgfkyewn" path="res://design/level12.png" id="19_3diia"]
+[ext_resource type="Texture2D" uid="uid://cp8t0adpebi1w" path="res://design/level13.png" id="20_rpmxk"]
+[ext_resource type="Script" uid="uid://v6lei8gr48ov" path="res://scripts/gameplay/room_camera.gd" id="21_roomcam"]
+[ext_resource type="Script" uid="uid://ctw0vi75hwwuo" path="res://scripts/gameplay/room_region.gd" id="22_roomreg"]
+[ext_resource type="Texture2D" uid="uid://c20t1iunhoa6i" path="res://design/level2final22.png" id="23_bu2lm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
 radius = 18.0
@@ -130,13 +145,67 @@ size = Vector2(473, 179.5)
 [node name="Backdrop" type="Node2D" parent="." unique_id=1080361096]
 script = ExtResource("1_nioiv")
 
+[node name="RoomCamera" type="Node2D" parent="." unique_id=1782223569]
+script = ExtResource("21_roomcam")
+
+[node name="RoomLevel2" type="Node2D" parent="RoomCamera" unique_id=2100000001]
+position = Vector2(689, -3001)
+script = ExtResource("22_roomreg")
+room_name = "Level2"
+
+[node name="RoomLevel3" type="Node2D" parent="RoomCamera" unique_id=2100000002]
+position = Vector2(2610, -3001)
+script = ExtResource("22_roomreg")
+room_name = "Level3"
+
+[node name="RoomLevel5" type="Node2D" parent="RoomCamera" unique_id=2100000003]
+position = Vector2(689, -1921)
+script = ExtResource("22_roomreg")
+room_name = "Level5"
+
+[node name="RoomLevel6" type="Node2D" parent="RoomCamera" unique_id=2100000004]
+position = Vector2(2610, -1921)
+script = ExtResource("22_roomreg")
+room_name = "Level6"
+
+[node name="RoomLevel7" type="Node2D" parent="RoomCamera" unique_id=2100000005]
+position = Vector2(4538, -1921)
+script = ExtResource("22_roomreg")
+room_name = "Level7"
+
+[node name="RoomLevel8" type="Node2D" parent="RoomCamera" unique_id=2100000006]
+position = Vector2(689, -841)
+script = ExtResource("22_roomreg")
+room_name = "Level8"
+
+[node name="RoomLevel9" type="Node2D" parent="RoomCamera" unique_id=2100000007]
+position = Vector2(2610, -841)
+script = ExtResource("22_roomreg")
+room_name = "Level9"
+
+[node name="RoomLevel10" type="Node2D" parent="RoomCamera" unique_id=2100000008]
+position = Vector2(4530, -841)
+script = ExtResource("22_roomreg")
+room_name = "Level10"
+
+[node name="RoomLevel11" type="Node2D" parent="RoomCamera" unique_id=2100000009]
+position = Vector2(688, 240)
+script = ExtResource("22_roomreg")
+room_name = "Level11"
+
+[node name="RoomLevel12" type="Node2D" parent="RoomCamera" unique_id=2100000010]
+position = Vector2(2609, 240)
+script = ExtResource("22_roomreg")
+room_name = "Level12"
+
+[node name="RoomLevel13" type="Node2D" parent="RoomCamera" unique_id=2100000011]
+position = Vector2(4530, 239)
+script = ExtResource("22_roomreg")
+room_name = "Level13"
+
 [node name="Player" type="CharacterBody2D" parent="." unique_id=1107322508]
 position = Vector2(180, 400)
 script = ExtResource("2_bvm0p")
-
-[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1782223568]
-position = Vector2(192, -133)
-zoom = Vector2(0.61, 0.61)
 
 [node name="Collision" type="CollisionShape2D" parent="Player" unique_id=753285637]
 shape = SubResource("CircleShape2D_bxw12")
@@ -392,7 +461,7 @@ spread = 20.0
 z_index = 4
 texture_filter = 1
 position = Vector2(2609, -1381)
-texture = ExtResource("20_bu2lm")
+texture = ExtResource("23_bu2lm")
 metadata/_edit_lock_ = true
 
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=171644288]
