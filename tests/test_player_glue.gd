@@ -13,6 +13,8 @@ func _initialize() -> void:
 	_assert(_tuning != null, "game tuning autoload exists")
 	_assert(load("res://scenes/gameplay/glue_ball.tscn") != null, "glue ball scene loads")
 	_assert(load("res://scenes/levels/player_test.tscn") != null, "player test scene loads")
+	_assert(load("res://scenes/levels/paint_lab.tscn") != null, "paint lab scene loads")
+	_assert(load("res://scripts/gameplay/paint_wall.gd") != null, "paint wall script loads")
 	_assert(load("res://scenes/levels/shader_test.tscn") != null, "shader test scene loads")
 	_assert(load("res://shaders/liquid_ball.gdshader") != null, "liquid shader loads")
 	_assert(load("res://shaders/liquid_blob.gdshader") != null, "single blob liquid shader loads")
@@ -75,6 +77,21 @@ func _initialize() -> void:
 	ball.free()
 	await _wait_physics_frames(20)
 	_assert(sprite.animation == &"idle", "player settles into idle animation")
+
+	var paint_scene := load("res://scenes/levels/paint_lab.tscn") as PackedScene
+	var paint_level := paint_scene.instantiate()
+	root.add_child(paint_level)
+	await process_frame
+	var shelf := paint_level.get_node_or_null("ShelfSmooth")
+	var block := paint_level.get_node_or_null("BlockRough")
+	_assert(shelf != null and shelf.get("smooth") == true and shelf.collision_layer == 2, "paint lab smooth wall uses layer 2")
+	_assert(block != null and block.get("smooth") == false and block.collision_layer == 1, "paint lab rough wall uses layer 1")
+	var shelf_collision := shelf.get_node_or_null("Collision") as CollisionShape2D
+	_assert(shelf_collision != null and shelf_collision.shape is RectangleShape2D, "paint lab wall has rectangle collision")
+	var shelf_size: Vector2 = shelf.call("get_wall_size")
+	_assert(is_equal_approx(shelf_size.x, 1.8) and is_equal_approx(shelf_size.y, 0.24), "paint lab wall size derives from size_px")
+	paint_level.free()
+	await _wait_physics_frames(2)
 
 	Input.action_press("move_right")
 	await _wait_physics_frames(8)

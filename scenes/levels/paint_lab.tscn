@@ -1,0 +1,54 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/level_bg.gd" id="1_yunhs"]
+[ext_resource type="Script" path="res://scripts/gameplay/paint_wall.gd" id="2_j1lam"]
+
+[node name="PaintLab" type="Node2D" unique_id=1895755481]
+
+[node name="Backdrop" type="Node2D" parent="." unique_id=1511744012]
+script = ExtResource("1_yunhs")
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=252312869]
+position = Vector2(160, 420)
+script = ExtResource("2_j1lam")
+size_px = Vector2(1200, 32)
+
+[node name="WallLeft" type="StaticBody2D" parent="." unique_id=1634465726]
+position = Vector2(24, 250)
+script = ExtResource("2_j1lam")
+size_px = Vector2(48, 420)
+
+[node name="WallRight" type="StaticBody2D" parent="." unique_id=1829777120]
+position = Vector2(296, 250)
+script = ExtResource("2_j1lam")
+size_px = Vector2(48, 420)
+
+[node name="ShelfSmooth" type="StaticBody2D" parent="." unique_id=509830306]
+position = Vector2(160, 250)
+script = ExtResource("2_j1lam")
+smooth = true
+size_px = Vector2(180, 24)
+
+[node name="BlockRough" type="StaticBody2D" parent="." unique_id=1180546096]
+position = Vector2(230, 360)
+script = ExtResource("2_j1lam")
+size_px = Vector2(70, 90)
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1384350266]
+layer = 10
+
+[node name="HUDContent" type="Control" parent="HUD" unique_id=854379576]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Title" type="Label" parent="HUD/HUDContent" unique_id=1983359040]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 24.0
+offset_bottom = 24.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.75, 0.78, 0.88, 1)
+text = "Paint Lab: drop your texture into assets/walls, replace it on any painted wall"
