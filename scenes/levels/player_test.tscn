@@ -1,0 +1,142 @@
+[gd_scene format=3 uid="uid://ejpx15bm8ar"]
+
+[ext_resource type="Script" uid="uid://dx33331kwaptt" path="res://scripts/gameplay/level_bg.gd" id="1_nioiv"]
+[ext_resource type="Script" uid="uid://c4n63ljpprydf" path="res://scripts/gameplay/player.gd" id="2_bvm0p"]
+[ext_resource type="Script" uid="uid://k365tnjdxevo" path="res://scripts/gameplay/blob_backdrop.gd" id="3_f482d"]
+[ext_resource type="SpriteFrames" uid="uid://bsbtryl4v8v8n" path="res://assets/character/lumpy_animations.tres" id="4_p5qbh"]
+[ext_resource type="Script" uid="uid://b0hm3daen57dg" path="res://scripts/gameplay/test_wall.gd" id="5_ro0ym"]
+[ext_resource type="Script" uid="uid://dhthq280ccnvi" path="res://scripts/gameplay/player_test_level.gd" id="6_o7xpx"]
+[ext_resource type="Script" uid="uid://x7756bwqmrgc" path="res://scripts/gameplay/level_hud.gd" id="7_2blty"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
+radius = 18.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tp06i"]
+size = Vector2(320, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ugs25"]
+size = Vector2(720, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a7rkt"]
+size = Vector2(24, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vb2ee"]
+size = Vector2(24, 420)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f7fgh"]
+size = Vector2(180, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bu2lm"]
+size = Vector2(150, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_drc7l"]
+size = Vector2(16, 90)
+
+[node name="PlayerTest" type="Node2D" unique_id=408281853]
+
+[node name="Backdrop" type="Node2D" parent="." unique_id=1080361096]
+script = ExtResource("1_nioiv")
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1107322508]
+position = Vector2(180, 400)
+script = ExtResource("2_bvm0p")
+
+[node name="Collision" type="CollisionShape2D" parent="Player" unique_id=753285637]
+shape = SubResource("CircleShape2D_bxw12")
+
+[node name="VisualBlob" type="Node2D" parent="Player" unique_id=1197644143]
+position = Vector2(0, -1)
+script = ExtResource("3_f482d")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player" unique_id=1844131707]
+z_index = 2
+position = Vector2(0, -15)
+scale = Vector2(0.72, 0.72)
+sprite_frames = ExtResource("4_p5qbh")
+animation = &"idle"
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1782223568]
+
+[node name="Wall" type="StaticBody2D" parent="." unique_id=2043727294]
+position = Vector2(40, 520)
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="Wall" unique_id=160067285]
+shape = SubResource("RectangleShape2D_tp06i")
+
+[node name="@StaticBody2D@2" type="StaticBody2D" parent="." unique_id=166537177]
+position = Vector2(430, 540)
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@2" unique_id=644190170]
+shape = SubResource("RectangleShape2D_ugs25")
+
+[node name="@StaticBody2D@3" type="StaticBody2D" parent="." unique_id=728747365]
+position = Vector2(120, 250)
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@3" unique_id=938714320]
+shape = SubResource("RectangleShape2D_a7rkt")
+
+[node name="@StaticBody2D@4" type="StaticBody2D" parent="." unique_id=873565523]
+position = Vector2(890, 330)
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@4" unique_id=1891134067]
+shape = SubResource("RectangleShape2D_vb2ee")
+
+[node name="@StaticBody2D@5" type="StaticBody2D" parent="." unique_id=884494218]
+position = Vector2(640, 390)
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@5" unique_id=685880849]
+shape = SubResource("RectangleShape2D_f7fgh")
+
+[node name="WallSmooth" type="StaticBody2D" parent="." unique_id=1719339860]
+position = Vector2(680, 150)
+collision_layer = 2
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="WallSmooth" unique_id=143516242]
+shape = SubResource("RectangleShape2D_bu2lm")
+
+[node name="@StaticBody2D@6" type="StaticBody2D" parent="." unique_id=1136614665]
+position = Vector2(330, 330)
+collision_layer = 2
+script = ExtResource("5_ro0ym")
+
+[node name="Shape" type="CollisionShape2D" parent="@StaticBody2D@6" unique_id=897906733]
+shape = SubResource("RectangleShape2D_drc7l")
+
+[node name="LevelLogic" type="Node2D" parent="." unique_id=487241875]
+script = ExtResource("6_o7xpx")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1604737722]
+layer = 10
+
+[node name="HUDContent" type="Control" parent="HUD" unique_id=1038716151]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_2blty")
+
+[node name="GlueLabel" type="Label" parent="HUD/HUDContent" unique_id=218282750]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 24.0
+offset_bottom = 24.0
+theme_override_font_sizes/font_size = 24
+text = "glue: --/--"
+
+[node name="Controls" type="Label" parent="HUD/HUDContent" unique_id=1411302303]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 58.0
+offset_right = 24.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(0.75, 0.78, 0.88, 1)
+text = "A/D move   Space jump   LMB spit   RMB suck   R restart"
