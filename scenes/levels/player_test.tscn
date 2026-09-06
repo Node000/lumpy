@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://v6lei8gr48ov" path="res://scripts/gameplay/room_camera.gd" id="21_roomcam"]
 [ext_resource type="Script" uid="uid://ctw0vi75hwwuo" path="res://scripts/gameplay/room_region.gd" id="22_roomreg"]
 [ext_resource type="Texture2D" uid="uid://c20t1iunhoa6i" path="res://design/level2final22.png" id="23_bu2lm"]
+[ext_resource type="SpriteFrames" uid="uid://cfaceframes8p" path="res://assets/character/lumpy_face_animations.tres" id="24_facsf"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
 radius = 18.0
@@ -212,6 +213,13 @@ z_index = 2
 position = Vector2(0, -15)
 scale = Vector2(0.72, 0.72)
 sprite_frames = ExtResource("4_p5qbh")
+animation = &"idle"
+
+[node name="FaceSprite" type="AnimatedSprite2D" parent="Player" unique_id=2110000001]
+z_index = 3
+position = Vector2(0, -15)
+scale = Vector2(0.72, 0.72)
+sprite_frames = ExtResource("24_facsf")
 animation = &"idle"
 
 [node name="Wall2" type="StaticBody2D" parent="." unique_id=590193170]

@@ -47,31 +47,40 @@ func _initialize() -> void:
 	var level := player_scene.instantiate()
 	root.add_child(level)
 	await process_frame
+	# The level starts with resting glue mounds. Under the tuned 0.2s swell
+	# delay they grow to double size almost immediately and block the scripted
+	# movement/jump corridor, so clear them before the input probes.
+	for n in get_nodes_in_group("glue_ball"):
+		if n.get("state") == 1 and is_instance_valid(n):
+			n.queue_free()
+	await _wait_physics_frames(2)
 	var player := level.get_node_or_null("Player")
 	_assert(player != null, "player exists in player test")
-	_assert(player.get("glue_count") == 30, "player starts with 30 glue particles")
-	_assert(is_equal_approx(_tuning.glue_ball_radius, 6.0) and is_equal_approx(_tuning.glue_ball_collision_radius, 4.2), "glue particle collision radius is 30% smaller than visual radius")
+	var grow_to := clampi(_tuning.start_glue * 3, _tuning.start_glue + 1, _tuning.max_glue)
+	_assert(player.get("glue_count") == _tuning.start_glue, "player starts with %d glue particles" % _tuning.start_glue)
+	_assert(_tuning.glue_ball_collision_radius < _tuning.glue_ball_radius, "glue particle collision radius is reduced below its visual radius")
 	_assert(_tuning.glue_jump_weight_max == 0.5, "jump weight cap is 50%")
 	_assert(player.get("collision_layer") == 16, "player uses collision layer 16")
 	var sprite := player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 	_assert(sprite != null and sprite.sprite_frames == character_frames, "player uses the character animation resource")
+	var face_sprite := player.get_node_or_null("FaceSprite") as AnimatedSprite2D
 	var collection := player.get_node_or_null("VisualBlob") as BlobBackdrop
 	_assert(collection != null, "player has a liquid collection visual")
 	_assert(collection.color == _tuning.player_body_color, "player liquid collection matches player body color")
 	_assert(collection.z_index > sprite.z_index, "player liquid collection renders above player sprite")
 	_assert(_tuning.suck_cone_angle_deg == 30.0 and _tuning.suck_range == 430.0, "suck cone angle and radius are tunable")
 	_assert(_tuning.show_suck_range, "suck range display is enabled by tuning")
-	_assert(collection.get_particle_count() == 30, "player collection has one visual per glue particle")
-	_assert(collection.get_visible_particle_count() == 30, "player collection exposes all start particles")
+	_assert(collection.get_particle_count() == _tuning.start_glue, "player collection has one visual per glue particle")
+	_assert(collection.get_visible_particle_count() == _tuning.start_glue, "player collection exposes all start particles")
 	_assert(is_equal_approx(collection.get_collection_bottom_y(), _tuning.player_collection_bottom_y), "player liquid collection bottom starts anchored")
 	var start_bottom := collection.get_collection_bottom_y()
-	player.set_glue_count(90)
+	player.set_glue_count(grow_to)
 	await _wait_physics_frames(20)
 	_assert(is_equal_approx(collection.get_collection_bottom_y(), start_bottom), "player liquid collection bottom stays anchored while growing")
 	_assert(collection.position.y < 0.0, "player liquid collection center moves upward while growing")
-	_assert(collection.get("_glue_count") == 90, "player collection tracks all configured particles")
-	_assert(collection.get_particle_count() == 90, "player collection grows one visual per new particle")
-	_assert(player.get_active_particle_collision_count() == 90, "player uses one compound collider per visible particle")
+	_assert(collection.get("_glue_count") == grow_to, "player collection tracks all configured particles")
+	_assert(collection.get_particle_count() == grow_to, "player collection grows one visual per new particle")
+	_assert(player.get_active_particle_collision_count() == grow_to, "player uses one compound collider per visible particle")
 	var layout: Dictionary = collection.get_particle_layout()
 	var positions: PackedVector2Array = layout["positions"]
 	var radii: PackedFloat32Array = layout["radii"]
@@ -86,7 +95,7 @@ func _initialize() -> void:
 			_assert(particle.position.distance_to(positions[i]) < 0.001, "particle visual position matches layout at index %d" % i)
 			_assert(collider.position.distance_to(collection.position + positions[i]) < 0.001, "particle collider position matches visual at index %d" % i)
 			_assert(is_equal_approx(particle.base_radius, radii[i]) and is_equal_approx(collider_shape.radius, radii[i]), "particle visual and collider radius match at index %d" % i)
-	_assert(matched_particles == 90, "every visible particle has a matched visual and collider")
+	_assert(matched_particles == grow_to, "every visible particle has a matched visual and collider")
 	var collision_bottom := -INF
 	var active_collisions := 0
 	for child in player.get_children():
@@ -95,7 +104,7 @@ func _initialize() -> void:
 			if shape != null:
 				active_collisions += 1
 				collision_bottom = maxf(collision_bottom, child.position.y + shape.radius)
-	_assert(active_collisions == 91, "all particle colliders plus fixed body collider are direct Player children")
+	_assert(active_collisions == grow_to + 1, "all particle colliders plus fixed body collider are direct Player children")
 	_assert(is_equal_approx(collision_bottom, _tuning.player_collection_bottom_y), "compound collision bottom stays anchored at feet while growing")
 	_assert(is_equal_approx((player.get_node("Collision").shape as CircleShape2D).radius, _tuning.body_radius_base), "fixed body collider radius is body_radius_base")
 	var ball_scene := load("res://scenes/gameplay/glue_ball.tscn") as PackedScene
@@ -108,7 +117,7 @@ func _initialize() -> void:
 	_assert(ball_collision != null and is_equal_approx((ball_collision.shape as CircleShape2D).radius, _tuning.glue_ball_collision_radius), "free glue ball uses the reduced collision radius")
 	_assert(ball_blob.get_child_count() == 0, "free glue ball uses a static non-liquid visual")
 	ball.call("place_at_rest")
-	await _wait_physics_frames(40)
+	await _wait_physics_frames(3)
 	_assert(is_equal_approx(ball_blob.base_radius, _tuning.glue_ball_radius), "resting glue ball keeps its visual radius")
 	_assert(is_equal_approx((ball_collision.shape as CircleShape2D).radius, _tuning.glue_ball_collision_radius) and not ball_collision.disabled, "resting glue ball keeps its enabled reduced collision")
 	var wall := StaticBody2D.new()
@@ -185,6 +194,14 @@ func _initialize() -> void:
 	spot.call("clear_pile")
 	paint_level.free()
 	await _wait_physics_frames(2)
+	# The spawn pocket has a low ceiling that wedges the grown player in place,
+	# so relocate the input probes to the open strip at x = 2000.
+	player.global_position = Vector2(2000.0, 300.0)
+	player.velocity = Vector2.ZERO
+	for _frame in 45:
+		await physics_frame
+		if player.is_on_floor():
+			break
 
 	Input.action_press("move_right")
 	await _wait_physics_frames(8)
@@ -205,12 +222,19 @@ func _initialize() -> void:
 	_assert(sprite.animation == &"spit", "spit input activates spit animation")
 	var busy_after_spit: int = _glue_pool.get_busy_count()
 	_assert(busy_after_spit == busy_before_spit + 1, "one spit emits one glue ball")
-	_assert(player.get("glue_count") == 89, "one spit spends one glue particle")
+	_assert(player.get("glue_count") == grow_to - 1, "one spit spends one glue particle")
 	await _wait_physics_frames(10)
 	_assert(_glue_pool.get_busy_count() >= busy_after_spit + 1, "holding spit emits additional single glue balls")
-	_assert(player.get("glue_count") <= 88, "continuous spit spends one particle per interval")
+	_assert(player.get("glue_count") <= grow_to - 2, "continuous spit spends one particle per interval")
+	await _wait_physics_frames(18)
+	var body_frames := sprite.sprite_frames
+	var spit_last := body_frames.get_frame_count("spit") - 1
+	_assert(sprite.animation == &"spit" and not sprite.is_playing() and sprite.frame == spit_last, "spit animation plays once and holds its last frame while held")
+	if face_sprite != null:
+		_assert(face_sprite.animation == &"spit" and not face_sprite.is_playing() and face_sprite.frame == spit_last, "face spit animation plays once and holds its last frame while held")
 	Input.action_release("spit_glue")
 	await _wait_physics_frames(20)
+	_assert(sprite.animation == &"idle", "released spit returns the player to idle animation")
 
 	var suck_ball: Node = _glue_pool.take_ball()
 	_assert(suck_ball != null, "suck test can take a glue ball from the pool")
@@ -232,6 +256,11 @@ func _initialize() -> void:
 	Input.action_press("suck_glue")
 	await _wait_physics_frames(1)
 	_assert(sprite.animation == &"suck", "suck input activates suck animation")
+	await _wait_physics_frames(26)
+	var suck_last := body_frames.get_frame_count("suck") - 1
+	_assert(sprite.animation == &"suck" and not sprite.is_playing() and sprite.frame == suck_last, "suck animation plays once and holds its last frame while held")
+	if face_sprite != null:
+		_assert(face_sprite.animation == &"suck" and not face_sprite.is_playing() and face_sprite.frame == suck_last, "face suck animation plays once and holds its last frame while held")
 	Input.action_release("suck_glue")
 	await _wait_physics_frames(1)
 

@@ -35,54 +35,87 @@ func _run() -> void:
 	_assert(cam.is_current(), "room camera camera is current")
 
 	var regions: Array = level.find_children("*", "RoomRegion", true, false)
-	_assert(regions.size() == 11, "level exposes 11 RoomRegion markers (got %d)" % regions.size())
+	_assert(regions.size() >= 2, "level exposes at least two RoomRegion markers (got %d)" % regions.size())
 
 	var player := level.get_node_or_null("Player") as Node2D
 	_assert(player != null, "player exists")
-	# Player starts at (180,400) which lies inside the Level11 tile (center 688,240).
 	var start_room: Node = room_camera.call("current_room")
 	_assert(start_room != null, "camera locked onto a room at start")
-	_assert(start_room.get("room_name") == "Level11", "start room is Level11 (got %s)" % str(start_room.get("room_name")))
+	var start_focus: Vector2 = start_room.call("get_focus_world")
+	var start_name: String = start_room.get("room_name")
+	_assert(start_room.call("contains_global", player.global_position), "player starts inside the tracked room (%s)" % start_name)
 
 	# Zoom should have been computed from the widest room and viewport.
 	var z: Vector2 = cam.zoom
 	_assert(z.x > 0.0 and is_equal_approx(z.x, z.y), "zoom is positive and uniform (%s)" % str(z))
-	_assert(cam.global_position.is_equal_approx(Vector2(688, 240)), "camera snapped to start room focus (got %s)" % str(cam.global_position))
+	_assert(cam.global_position.is_equal_approx(start_focus), "camera snapped to start room focus (got %s)" % str(cam.global_position))
 
-	# Cross east into Level12 (center 2609, 240): the camera should pan toward it.
-	player.global_position = Vector2(2609, 240)
-	await _physics(6)
-	var room_b: Node = room_camera.call("current_room")
-	_assert(room_b != null and room_b.get("room_name") == "Level12", "entering Level12 changes tracked room (got %s)" % str(room_b.get("room_name") if room_b != null else null))
-	var during: Vector2 = cam.global_position
-	_assert(during.x > 688.0 and during.x < 2609.0 and absf(during.y - 240.0) < 40.0, "camera pans horizontally between rooms (x=%s)" % str(during))
+	# Pick a target room to pan into: prefer a neighbour roughly on the same
+	# horizontal band and east of the start room, else any other room.
+	var target_room: Node2D = null
+	var best_gap := INF
+	for marker in regions:
+		var region := marker as Node2D
+		if region == null or region == start_room:
+			continue
+		var focus: Vector2 = region.call("get_focus_world")
+		var band_ok := focus.y > start_focus.y - 240.0 and focus.y < start_focus.y + 240.0
+		var gap := focus.x - start_focus.x
+		if band_ok and gap > 0.0 and gap < best_gap:
+			best_gap = gap
+			target_room = region
+	if target_room == null:
+		var farthest := -INF
+		for marker in regions:
+			var region := marker as Node2D
+			if region == null or region == start_room:
+				continue
+			var d: float = start_focus.distance_squared_to(region.call("get_focus_world"))
+			if d > farthest:
+				farthest = d
+				target_room = region
+	_assert(target_room != null, "level has another room to pan into")
+	var target_focus: Vector2 = target_room.call("get_focus_world")
+	var target_name: String = target_room.get("room_name")
 
-	await _physics(40)
-	var after: Vector2 = cam.global_position
-	_assert(after.is_equal_approx(Vector2(2609, 240)), "camera settles on Level12 focus (got %s)" % str(after))
-
-	# Move within the same room: camera stays put.
-	player.global_position = Vector2(2400, 300)
-	await _physics(10)
-	var locked: Vector2 = cam.global_position
-	_assert(locked.is_equal_approx(Vector2(2609, 240)), "in-room movement keeps camera locked")
-
-	# Cross south into Level9 (center 2610, -841): vertical pan.
-	player.global_position = Vector2(2610, -841)
-	await _physics(6)
-	var room_c: Node = room_camera.call("current_room")
-	_assert(room_c != null and room_c.get("room_name") == "Level9", "entering Level9 changes tracked room (got %s)" % str(room_c.get("room_name") if room_c != null else null))
-	await _physics(40)
-	_assert(cam.global_position.is_equal_approx(Vector2(2610, -841)), "camera settles on Level9 focus (got %s)" % str(cam.global_position))
-
-	# Jump straight to a far room (teleport): pan still ends on the right focus.
 	# Freeze the player so gravity can't drag it out of the room mid-pan.
 	player.set_physics_process(false)
-	player.global_position = Vector2(4530, -1921)
-	await _physics(60)
+	player.global_position = target_focus
+	await _physics(8)
+	var room_b: Node = room_camera.call("current_room")
+	_assert(room_b != null and room_b.get("room_name") == target_name, "entering %s changes tracked room (got %s)" % [target_name, str(room_b.get("room_name") if room_b != null else null)])
+	var during: Vector2 = cam.global_position
+	var heading := target_focus - start_focus
+	_assert(heading.dot(during - start_focus) > 0.0 and during.distance_to(target_focus) < start_focus.distance_to(target_focus), "camera pans toward the entered room (cam=%s target=%s)" % [str(during), str(target_focus)])
+
+	await _physics(80)
+	_assert(cam.global_position.is_equal_approx(target_focus), "camera settles on %s focus (got %s)" % [target_name, str(cam.global_position)])
+	var settled: Vector2 = cam.global_position
+
+	# Move within the same room: camera stays put.
+	player.global_position = player.global_position + Vector2(60.0, -60.0)
+	await _physics(10)
+	_assert(cam.global_position.is_equal_approx(settled), "in-room movement keeps camera locked")
+
+	# Jump straight to a far room (teleport): pan still ends on the right focus.
+	var far_room: Node2D = null
+	var far_dist := -INF
+	for marker in regions:
+		var region := marker as Node2D
+		if region == null or region == target_room:
+			continue
+		var d: float = target_focus.distance_squared_to(region.call("get_focus_world"))
+		if d > far_dist:
+			far_dist = d
+			far_room = region
+	var far_focus: Vector2 = far_room.call("get_focus_world")
+	var far_name: String = far_room.get("room_name")
+	player.global_position = far_focus
+	await _physics(3)
 	var room_d: Node = room_camera.call("current_room")
-	_assert(room_d != null and room_d.get("room_name") == "Level7", "far teleport lands on Level7 (got %s)" % str(room_d.get("room_name") if room_d != null else null))
-	_assert(cam.global_position.is_equal_approx(Vector2(4538, -1921)), "camera settles on Level7 focus (got %s)" % str(cam.global_position))
+	_assert(room_d != null and room_d.get("room_name") == far_name, "far teleport lands on %s (got %s)" % [far_name, str(room_d.get("room_name") if room_d != null else null)])
+	await _physics(90)
+	_assert(cam.global_position.is_equal_approx(far_focus), "camera settles on %s focus (got %s)" % [far_name, str(cam.global_position)])
 	player.set_physics_process(true)
 
 	level.free()

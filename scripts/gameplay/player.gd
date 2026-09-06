@@ -17,6 +17,7 @@ const LAYER_PLAYER := 16
 @onready var _collision: CollisionShape2D = get_node_or_null("Collision") as CollisionShape2D
 @onready var _blob: BlobBackdrop = get_node_or_null("VisualBlob") as BlobBackdrop
 @onready var _animated_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+@onready var _face_sprite: AnimatedSprite2D = get_node_or_null("FaceSprite") as AnimatedSprite2D
 
 var glue_count: int = 0
 var facing := 1
@@ -31,7 +32,9 @@ var _spit_cooldown_timer := 0.0
 var _suck_recast_timer := 0.0
 var _time := 0.0
 var _pending_suck: Array[Node] = []
-var _action_animation_timer := 0.0
+var _action_anim := &""
+var _spit_was_down := false
+var _suck_was_down := false
 
 
 func get_glue() -> int:
@@ -58,8 +61,7 @@ func _ready() -> void:
 		_blob.set_glue_count(glue_count)
 		_blob.set_glue_color(GameTuning.player_body_color)
 	_sync_particle_collisions()
-	if _animated_sprite != null:
-		_animated_sprite.play("idle")
+	_play_body_animation(&"idle")
 	GameplayEvents.emit_glue_changed(glue_count, GameTuning.max_glue)
 
 
@@ -82,8 +84,6 @@ func notify_ball_collected(ball: Node) -> void:
 
 func _physics_process(delta: float) -> void:
 	_time += delta
-	if _action_animation_timer > 0.0:
-		_action_animation_timer -= delta
 	_gravity_scale = 1.0
 
 	if _spit_cooldown_timer > 0.0:
@@ -133,16 +133,30 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("restart_level"):
 		get_tree().reload_current_scene()
 
-	if Input.is_action_pressed("suck_glue") or Input.is_action_pressed("spit_glue"):
+	var spit_down := Input.is_action_pressed("spit_glue")
+	var suck_down := Input.is_action_pressed("suck_glue")
+	if spit_down or suck_down:
 		var to_mouse := get_global_mouse_position() - global_position
 		if to_mouse.length_squared() > 1.0:
 			_aim_dir = to_mouse.normalized()
-	if Input.is_action_pressed("spit_glue"):
+	if spit_down and not _spit_was_down:
+		_start_action_animation(&"spit")
+	if spit_down:
 		_spit()
-	if Input.is_action_pressed("suck_glue"):
+	if suck_down and not _suck_was_down:
+		_start_action_animation(&"suck")
+	if suck_down:
 		_try_suck()
+	if _spit_was_down and not spit_down and _action_anim == &"spit":
+		_action_anim = &""
+	if _suck_was_down and not suck_down and _action_anim == &"suck":
+		_action_anim = &""
+	_spit_was_down = spit_down
+	_suck_was_down = suck_down
 	if _animated_sprite != null:
 		_animated_sprite.flip_h = facing < 0
+	if _face_sprite != null:
+		_face_sprite.flip_h = facing < 0
 	_update_animation()
 
 	queue_redraw()
@@ -233,7 +247,6 @@ func _spit() -> void:
 	if ball == null:
 		return
 	_spit_cooldown_timer = GameTuning.spit_interval
-	_play_action_animation("spit", 0.30)
 	var r: float = _current_radius()
 	set_glue_count(glue_count - 1)
 	var half_spread := deg_to_rad(GameTuning.spit_spread_deg * 0.5)
@@ -251,7 +264,6 @@ func _try_suck() -> void:
 	if _suck_recast_timer > 0.0:
 		return
 	_suck_recast_timer = GameTuning.suck_recast_time
-	_play_action_animation("suck", 0.34)
 	var space := get_world_2d().direct_space_state
 	var q := PhysicsShapeQueryParameters2D.new()
 	var circ := CircleShape2D.new()
@@ -290,22 +302,43 @@ func _draw() -> void:
 		_draw_suck_cone()
 
 
-func _play_action_animation(animation_name: String, duration: float) -> void:
-	if _animated_sprite == null or _animated_sprite.sprite_frames == null:
-		return
-	_action_animation_timer = duration
-	_animated_sprite.play(animation_name)
+func _start_action_animation(animation_name: StringName) -> void:
+	# Action animations (spit/suck) are one-shot: they start once on the press
+	# edge and hold their last frame until the button is released.
+	_action_anim = animation_name
+	_play_body_animation(animation_name)
 
 
 func _update_animation() -> void:
-	if _animated_sprite == null or _action_animation_timer > 0.0:
+	if _animated_sprite == null or _action_anim != &"":
 		return
+	# Locomotion animations are one-shot too: jump plays once per takeoff and
+	# keeps its last frame until landing, then move/idle take over. Calling
+	# play() again while the same animation already shows would restart it, so
+	# every play is guarded.
 	if not is_on_floor():
-		_animated_sprite.play("jump")
+		_play_body_animation(&"jump")
 	elif absf(velocity.x) > 30.0:
-		_animated_sprite.play("move")
+		_play_body_animation(&"move")
 	else:
-		_animated_sprite.play("idle")
+		_play_body_animation(&"idle")
+
+
+func _play_body_animation(animation_name: StringName) -> void:
+	if _animated_sprite == null or _animated_sprite.sprite_frames == null:
+		return
+	if _animated_sprite.animation == animation_name and _animated_sprite.is_playing():
+		return
+	_animated_sprite.play(animation_name)
+	_play_on_face(animation_name)
+
+
+func _play_on_face(animation_name: StringName) -> void:
+	if _face_sprite == null or _face_sprite.sprite_frames == null:
+		return
+	if _face_sprite.animation == animation_name and _face_sprite.is_playing():
+		return
+	_face_sprite.play(animation_name)
 
 
 func _draw_suck_cone() -> void:

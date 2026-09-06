@@ -15,6 +15,7 @@ Prototype platformer and puzzle interaction loop. Player and glue balls are
 | spit_glue | Mouse left |
 | suck_glue | Mouse right |
 | restart_level | R |
+| toggle_settings | Escape |
 
 ## Scenes
 
@@ -45,6 +46,12 @@ Prototype platformer and puzzle interaction loop. Player and glue balls are
 - `res://scripts/core/gameplay_tuning.gd`: single tuning autoload.
 - `res://scripts/core/gameplay_events.gd`: cross-scene glue count signal.
 - `res://scripts/core/glue_pool.gd`: pooled glue ball instances.
+- `res://scripts/core/audio_manager.gd`: autoload; ensures `BGM`/`SFX` audio
+  buses exist and exposes bus-volume getters/setters for the settings menu.
+- `res://scripts/ui/settings_menu.gd`: autoload; Esc opens/closes a pause
+  menu with SFX/BGM volume sliders, a resume button, and a quit button.
+  Pausing uses `SceneTree.paused`; the menu itself runs with
+  `PROCESS_MODE_ALWAYS` so it keeps working while the game is paused.
 - `res://scripts/gameplay/test_wall.gd`: per-object smooth-wall property.
 - `res://scripts/gameplay/room_region.gd`: room marker node (hand-tuned rect,
   focus point) for the big-map camera.
@@ -74,6 +81,8 @@ Layer 1 is rough wall, layer 2 is smooth wall, layer 3 is resting glue, layer
   shader resources.
 - `tests/test_room_camera.gd` validates room-region markers, start-room snap,
   horizontal/vertical pan, in-room lock, and far-teleport settling.
+- `tests/test_settings_menu.gd` validates audio bus creation, volume setters,
+  the Esc pause toggle, and settings-menu slider/button layout.
 - Windowed capture helper: `scripts/qa/visual_capture.gd` with user args
   `--scene=res://... --output=...`.
 

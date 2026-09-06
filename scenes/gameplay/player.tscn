@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://c4n63ljpprydf" path="res://scripts/gameplay/player.gd" id="1_0j0ot"]
 [ext_resource type="Script" uid="uid://k365tnjdxevo" path="res://scripts/gameplay/blob_backdrop.gd" id="2_dap4h"]
 [ext_resource type="SpriteFrames" uid="uid://bsbtryl4v8v8n" path="res://assets/character/lumpy_animations.tres" id="3_ki2oj"]
+[ext_resource type="SpriteFrames" uid="uid://cfaceframes8p" path="res://assets/character/lumpy_face_animations.tres" id="4_facsf"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
 radius = 18.0
@@ -22,4 +23,11 @@ z_index = 2
 position = Vector2(0, -15)
 scale = Vector2(0.72, 0.72)
 sprite_frames = ExtResource("3_ki2oj")
+animation = &"idle"
+
+[node name="FaceSprite" type="AnimatedSprite2D" parent="." unique_id=2110000002]
+z_index = 3
+position = Vector2(0, -15)
+scale = Vector2(0.72, 0.72)
+sprite_frames = ExtResource("4_facsf")
 animation = &"idle"

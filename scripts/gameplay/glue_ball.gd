@@ -40,6 +40,11 @@ func _ready() -> void:
 	_apply_state_mask(State.FLY)
 	if not is_in_group("glue_ball"):
 		add_to_group("glue_ball")
+	# The scene's CircleShape2D is shared across instances, so every ball
+	# duplicates it: per-ball radius changes (swell, reset) must never leak
+	# into other balls that reuse the same packed scene resource.
+	_shape = _colshape.shape.duplicate()
+	_colshape.shape = _shape
 	_blob.set_radius(GameTuning.glue_ball_radius)
 	_blob.set_tint(Color(1, 1, 1, 0.95))
 	if _shape != null:
