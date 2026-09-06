@@ -6,6 +6,7 @@
 [ext_resource type="SpriteFrames" uid="uid://bsbtryl4v8v8n" path="res://assets/character/lumpy_animations.tres" id="4_p5qbh"]
 [ext_resource type="Script" uid="uid://x7756bwqmrgc" path="res://scripts/gameplay/level_hud.gd" id="7_2blty"]
 [ext_resource type="Script" uid="uid://c41i0hd8ph11c" path="res://scripts/gameplay/glue_spot.gd" id="8_f482d"]
+[ext_resource type="Script" uid="uid://cotrnrp7034an" path="res://scripts/gameplay/glue_no_stick_zone.gd" id="11_ro0ym"]
 [ext_resource type="Script" uid="uid://v6lei8gr48ov" path="res://scripts/gameplay/room_camera.gd" id="21_roomcam"]
 [ext_resource type="Script" uid="uid://ctw0vi75hwwuo" path="res://scripts/gameplay/room_region.gd" id="22_roomreg"]
 [ext_resource type="Texture2D" uid="uid://c20t1iunhoa6i" path="res://design/level2final22.png" id="23_bu2lm"]
@@ -14,8 +15,14 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_bxw12"]
 radius = 18.0
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2blty"]
+size = Vector2(346.875, 36.034492)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bxw12"]
+size = Vector2(104.375, 9.206884)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tp06i"]
-size = Vector2(320, 24.068962)
+size = Vector2(70.9375, 9.206884)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p5qbh"]
 size = Vector2(320, 343.81036)
@@ -192,6 +199,11 @@ position = Vector2(1777, -140)
 script = ExtResource("22_roomreg")
 room_name = "Level12"
 
+[node name="RoomLevel14" type="Node2D" parent="RoomCamera" unique_id=530933820]
+position = Vector2(1736, 374)
+script = ExtResource("22_roomreg")
+room_name = "Level12"
+
 [node name="RoomLevel13" type="Node2D" parent="RoomCamera" unique_id=2100000011]
 position = Vector2(4121, -108)
 script = ExtResource("22_roomreg")
@@ -228,7 +240,22 @@ position = Vector2(-377, 298.99997)
 scale = Vector2(1.6, 11.5999975)
 
 [node name="Shape24" type="CollisionShape2D" parent="Wall2" unique_id=160067285]
-position = Vector2(284.375, 24.017246)
+position = Vector2(269.6875, 29.482769)
+scale = Vector2(1, 1.0000001)
+shape = SubResource("RectangleShape2D_2blty")
+
+[node name="Shape40" type="CollisionShape2D" parent="Wall2" unique_id=880946538]
+position = Vector2(1219.0625, -219.5518)
+scale = Vector2(1, 1.0000001)
+shape = SubResource("RectangleShape2D_bxw12")
+
+[node name="Shape41" type="CollisionShape2D" parent="Wall2" unique_id=1901121762]
+position = Vector2(3005.1563, -129.86209)
+scale = Vector2(1, 1.0000001)
+shape = SubResource("RectangleShape2D_tp06i")
+
+[node name="Shape42" type="CollisionShape2D" parent="Wall2" unique_id=1247709484]
+position = Vector2(3005.1563, -129.86209)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_tp06i")
 
@@ -236,191 +263,229 @@ shape = SubResource("RectangleShape2D_tp06i")
 position = Vector2(0, -159.90521)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_p5qbh")
+metadata/_edit_lock_ = true
 
 [node name="Shape6" type="CollisionShape2D" parent="Wall2" unique_id=1652743755]
 position = Vector2(754.0625, -311.20703)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_njlhu")
+metadata/_edit_lock_ = true
 
 [node name="Shape17" type="CollisionShape2D" parent="Wall2" unique_id=74060450]
 position = Vector2(331.25, -245.08623)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_el8q8")
+metadata/_edit_lock_ = true
 
 [node name="Shape18" type="CollisionShape2D" parent="Wall2" unique_id=1098760425]
 position = Vector2(1023.125, -252.50006)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_br73u")
+metadata/_edit_lock_ = true
 
 [node name="Shape19" type="CollisionShape2D" parent="Wall2" unique_id=1120354649]
 position = Vector2(616.875, -234.3535)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_et2a1")
+metadata/_edit_lock_ = true
 
 [node name="Shape20" type="CollisionShape2D" parent="Wall2" unique_id=791838117]
 position = Vector2(2012.1875, -210.68973)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_8bv17")
+metadata/_edit_lock_ = true
 
 [node name="Shape21" type="CollisionShape2D" parent="Wall2" unique_id=1131249898]
 position = Vector2(276.40625, -203.87936)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_8oobl")
+metadata/_edit_lock_ = true
 
 [node name="Shape22" type="CollisionShape2D" parent="Wall2" unique_id=1693421707]
 position = Vector2(665.2344, -202.4785)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_6g6da")
+metadata/_edit_lock_ = true
 
 [node name="Shape23" type="CollisionShape2D" parent="Wall2" unique_id=1992877130]
 position = Vector2(526.4453, -196.65953)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_eh0ru")
+metadata/_edit_lock_ = true
 
 [node name="Shape7" type="CollisionShape2D" parent="Wall2" unique_id=1371741458]
 position = Vector2(2850.625, -266.2932)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_nqnve")
+metadata/_edit_lock_ = true
 
 [node name="Shape8" type="CollisionShape2D" parent="Wall2" unique_id=982192113]
 position = Vector2(2402.9688, -143.57762)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_1ai68")
+metadata/_edit_lock_ = true
 
 [node name="Shape9" type="CollisionShape2D" parent="Wall2" unique_id=2010020580]
 position = Vector2(2267.7344, -116.29315)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_1lb0t")
+metadata/_edit_lock_ = true
 
 [node name="Shape10" type="CollisionShape2D" parent="Wall2" unique_id=837781581]
 position = Vector2(1300.8203, -151.03452)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_gvgyn")
+metadata/_edit_lock_ = true
 
 [node name="Shape11" type="CollisionShape2D" parent="Wall2" unique_id=1473565254]
 position = Vector2(1033.6523, -91.81036)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_7i4gc")
+metadata/_edit_lock_ = true
 
 [node name="Shape12" type="CollisionShape2D" parent="Wall2" unique_id=1623666686]
 position = Vector2(1531.5137, -123.36211)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_hnj65")
+metadata/_edit_lock_ = true
 
 [node name="Shape13" type="CollisionShape2D" parent="Wall2" unique_id=2094611086]
 position = Vector2(1878.8818, -91.49788)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_qvkws")
+metadata/_edit_lock_ = true
 
 [node name="Shape14" type="CollisionShape2D" parent="Wall2" unique_id=1967387036]
 position = Vector2(1952.5659, -105.92137)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_062hh")
+metadata/_edit_lock_ = true
 
 [node name="Shape15" type="CollisionShape2D" parent="Wall2" unique_id=1926667412]
 position = Vector2(1911.875, -70.68967)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_oh1b0")
+metadata/_edit_lock_ = true
 
 [node name="Shape16" type="CollisionShape2D" parent="Wall2" unique_id=816409914]
 position = Vector2(1600.7977, -82.12692)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_urhk0")
+metadata/_edit_lock_ = true
 
 [node name="Shape2" type="CollisionShape2D" parent="Wall2" unique_id=1179320751]
 position = Vector2(209.375, -155.6854)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_li6xt")
+metadata/_edit_lock_ = true
 
 [node name="Shape3" type="CollisionShape2D" parent="Wall2" unique_id=59636629]
 position = Vector2(630.9375, -153.96771)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_h0ikd")
+metadata/_edit_lock_ = true
 
 [node name="Shape4" type="CollisionShape2D" parent="Wall2" unique_id=85905728]
 position = Vector2(791.25, -139.44078)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_qk58u")
+metadata/_edit_lock_ = true
 
 [node name="Shape5" type="CollisionShape2D" parent="Wall2" unique_id=1162309700]
 position = Vector2(940, -152.7476)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_m5c84")
+metadata/_edit_lock_ = true
 
 [node name="Shape26" type="CollisionShape2D" parent="Wall2" unique_id=644190170]
 position = Vector2(457.5, 37.586212)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_ugs25")
+metadata/_edit_lock_ = true
 
 [node name="Shape25" type="CollisionShape2D" parent="Wall2" unique_id=892806051]
 position = Vector2(270, -9.73707)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_ro0ym")
+metadata/_edit_lock_ = true
 
 [node name="Shape27" type="CollisionShape2D" parent="Wall2" unique_id=1891134067]
 position = Vector2(763.125, 31.89656)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_vb2ee")
+metadata/_edit_lock_ = true
 
 [node name="Shape28" type="CollisionShape2D" parent="Wall2" unique_id=1970672634]
 position = Vector2(1500.625, 30.086216)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_t6rly")
+metadata/_edit_lock_ = true
 
 [node name="Shape29" type="CollisionShape2D" parent="Wall2" unique_id=123693062]
 position = Vector2(2018.4375, 1.9396572)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_wulaj")
+metadata/_edit_lock_ = true
 
 [node name="Shape30" type="CollisionShape2D" parent="Wall2" unique_id=1698149211]
 position = Vector2(2538.9063, -16.72414)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_ossqv")
+metadata/_edit_lock_ = true
 
 [node name="Shape31" type="CollisionShape2D" parent="Wall2" unique_id=548716335]
 position = Vector2(2538.75, -77.99571)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_nyjjq")
+metadata/_edit_lock_ = true
 
 [node name="Shape32" type="CollisionShape2D" parent="Wall2" unique_id=941330227]
 position = Vector2(2616.9531, -63.362083)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_vsmyw")
+metadata/_edit_lock_ = true
 
 [node name="Shape33" type="CollisionShape2D" parent="Wall2" unique_id=1767634261]
 position = Vector2(3007.5, 19.9138)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_v1hfv")
+metadata/_edit_lock_ = true
 
 [node name="Shape34" type="CollisionShape2D" parent="Wall2" unique_id=1787034637]
 position = Vector2(3453.125, -88.79312)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_75g28")
+metadata/_edit_lock_ = true
 
 [node name="Shape35" type="CollisionShape2D" parent="Wall2" unique_id=623524314]
 position = Vector2(802.5, -27.241385)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_vb2ee")
+metadata/_edit_lock_ = true
 
 [node name="Shape36" type="CollisionShape2D" parent="Wall2" unique_id=2065768991]
 position = Vector2(1124.0625, -1.7672405)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_ie7oe")
+metadata/_edit_lock_ = true
 
 [node name="Shape37" type="CollisionShape2D" parent="Wall2" unique_id=897906733]
 position = Vector2(295.9375, -33.728455)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_f482d")
+metadata/_edit_lock_ = true
 
 [node name="Shape38" type="CollisionShape2D" parent="Wall2" unique_id=1037776732]
 position = Vector2(888.75, 2.931038)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_drc7l")
+metadata/_edit_lock_ = true
 
 [node name="Shape39" type="CollisionShape2D" parent="Wall2" unique_id=486495550]
 position = Vector2(483.75, -40.366386)
 scale = Vector2(0.625, 0.08620692)
 shape = SubResource("RectangleShape2D_o7xpx")
+metadata/_edit_lock_ = true
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1604737722]
 layer = 10
@@ -861,32 +926,26 @@ count = 8
 spread = 20.0
 
 [node name="Node2D4" type="Node2D" parent="." unique_id=2056884378]
-position = Vector2(1214, -240)
+position = Vector2(1444, -185)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D45" type="Node2D" parent="." unique_id=1487197196]
-position = Vector2(1239, -186)
+position = Vector2(1382, -194)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D5" type="Node2D" parent="." unique_id=1726704239]
-position = Vector2(1556, -408)
+position = Vector2(1540, -418)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D47" type="Node2D" parent="." unique_id=1685646473]
-position = Vector2(1612.9999, -426)
+position = Vector2(1596.9999, -401.99997)
 rotation = -0.37205833
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D6" type="Node2D" parent="." unique_id=1737655440]
-position = Vector2(3286, -436)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
@@ -1114,163 +1173,152 @@ count = 8
 spread = 20.0
 
 [node name="Node2D15" type="Node2D" parent="." unique_id=1673710839]
-position = Vector2(3755, -2090)
+position = Vector2(3122, -1732)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
-[node name="Node2D16" type="Node2D" parent="." unique_id=601318597]
-position = Vector2(3685, -1982)
+[node name="Node2D27" type="Node2D" parent="." unique_id=2115856514]
+position = Vector2(3175.9998, -1670.9998)
+rotation = -0.85259736
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
-[node name="Node2D21" type="Node2D" parent="." unique_id=1065675966]
-position = Vector2(3750, -1962)
+[node name="Node2D16" type="Node2D" parent="." unique_id=517794673]
+position = Vector2(3314, -781)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
-[node name="Node2D22" type="Node2D" parent="." unique_id=1907349556]
-position = Vector2(3703, -1902)
+[node name="Node2D17" type="Node2D" parent="." unique_id=1979034741]
+position = Vector2(3368, -766)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
-[node name="Node2D23" type="Node2D" parent="." unique_id=2128408940]
-position = Vector2(3712, -2061)
+[node name="Node2D26" type="Node2D" parent="." unique_id=1827453733]
+position = Vector2(3314, -745)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D18" type="Node2D" parent="." unique_id=513884940]
+position = Vector2(3418, -737)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D19" type="Node2D" parent="." unique_id=301329668]
+position = Vector2(3464, -781)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D21" type="Node2D" parent="." unique_id=576685893]
+position = Vector2(3512, -750)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D22" type="Node2D" parent="." unique_id=572410600]
+position = Vector2(3573, -790)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D23" type="Node2D" parent="." unique_id=1794234993]
+position = Vector2(3617, -754)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D25" type="Node2D" parent="." unique_id=18075064]
+position = Vector2(3650, -796)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D24" type="Node2D" parent="." unique_id=151207469]
-position = Vector2(3699, -2136)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D25" type="Node2D" parent="." unique_id=235075061]
-position = Vector2(3753, -2018)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D26" type="Node2D" parent="." unique_id=228319302]
-position = Vector2(3703, -1733)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D27" type="Node2D" parent="." unique_id=1399256558]
-position = Vector2(3754, -1805)
+position = Vector2(3116, -1977)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D28" type="Node2D" parent="." unique_id=2030361409]
-position = Vector2(3754, -1657)
+position = Vector2(3076, -1837)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D29" type="Node2D" parent="." unique_id=1549453936]
-position = Vector2(3642, -1631)
+position = Vector2(3130, -1636)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D31" type="Node2D" parent="." unique_id=1041865005]
+position = Vector2(3068, -1679)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D30" type="Node2D" parent="." unique_id=1352645080]
-position = Vector2(3673, -1704)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D31" type="Node2D" parent="." unique_id=271364249]
-position = Vector2(3663, -1767)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D32" type="Node2D" parent="." unique_id=640891227]
-position = Vector2(3642, -1869)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D33" type="Node2D" parent="." unique_id=1182616252]
-position = Vector2(3651, -1939)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D34" type="Node2D" parent="." unique_id=1652900111]
-position = Vector2(3610, -1986)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D35" type="Node2D" parent="." unique_id=1399763178]
-position = Vector2(3593, -2072)
+position = Vector2(3083, -1925)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D36" type="Node2D" parent="." unique_id=276093862]
-position = Vector2(3549, -2116)
+position = Vector2(3063, -2106)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D37" type="Node2D" parent="." unique_id=774004251]
-position = Vector2(3608, -2141)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D38" type="Node2D" parent="." unique_id=1694577679]
-position = Vector2(3660, -2046)
+position = Vector2(3117, -2051)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D39" type="Node2D" parent="." unique_id=1161195743]
-position = Vector2(3503, -2154)
+position = Vector2(3076, -2043)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D40" type="Node2D" parent="." unique_id=946264444]
-position = Vector2(3810, -2130)
+position = Vector2(3135, -2101)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D41" type="Node2D" parent="." unique_id=1814522852]
-position = Vector2(3833, -1636)
+position = Vector2(3138, -1795)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D46" type="Node2D" parent="." unique_id=547599191]
+position = Vector2(3164, -1944)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D42" type="Node2D" parent="." unique_id=517753943]
-position = Vector2(3647, -1681)
+position = Vector2(3057, -1902)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D43" type="Node2D" parent="." unique_id=770872833]
-position = Vector2(3578, -1637)
+position = Vector2(3070, -1625)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D44" type="Node2D" parent="." unique_id=499792328]
-position = Vector2(3522, -1628)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D46" type="Node2D" parent="." unique_id=1217754418]
-position = Vector2(3613, -1808)
+position = Vector2(3069, -1981)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
@@ -1288,7 +1336,19 @@ count = 8
 spread = 20.0
 
 [node name="Node2D81" type="Node2D" parent="." unique_id=435192362]
-position = Vector2(826, -1753)
+position = Vector2(852, -1489)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D105" type="Node2D" parent="." unique_id=503899440]
+position = Vector2(858, -1529)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D104" type="Node2D" parent="." unique_id=1346639024]
+position = Vector2(897, -1520)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
@@ -1305,6 +1365,30 @@ script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
+[node name="Node2D86" type="Node2D" parent="." unique_id=410498818]
+position = Vector2(306, -1738)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D87" type="Node2D" parent="." unique_id=679311918]
+position = Vector2(398, -1702)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D88" type="Node2D" parent="." unique_id=1480901795]
+position = Vector2(476, -1740)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D89" type="Node2D" parent="." unique_id=461280922]
+position = Vector2(237, -1745)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
 [node name="Node2D84" type="Node2D" parent="." unique_id=1179230487]
 position = Vector2(355, -1720)
 script = ExtResource("8_f482d")
@@ -1317,38 +1401,281 @@ script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
-[node name="Node2D49" type="Node2D" parent="." unique_id=1514659969]
-position = Vector2(3600, -1742)
+[node name="Node2D90" type="Node2D" parent="." unique_id=6896722]
+position = Vector2(541, -1896)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D91" type="Node2D" parent="." unique_id=1495858796]
+position = Vector2(619, -1870)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D92" type="Node2D" parent="." unique_id=72532028]
+position = Vector2(684, -1878)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D93" type="Node2D" parent="." unique_id=232213045]
+position = Vector2(641, -1896)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D94" type="Node2D" parent="." unique_id=1668160788]
+position = Vector2(726, -1900)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D95" type="Node2D" parent="." unique_id=1302851159]
+position = Vector2(542, -1843)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D100" type="Node2D" parent="." unique_id=2065800684]
+position = Vector2(595, -1889)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D106" type="Node2D" parent="." unique_id=907374023]
+position = Vector2(559, -2259)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D107" type="Node2D" parent="." unique_id=2020759097]
+position = Vector2(580, -2176)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D118" type="Node2D" parent="." unique_id=1141106216]
+position = Vector2(542, -2205)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D119" type="Node2D" parent="." unique_id=694119301]
+position = Vector2(77, -2279.0002)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D120" type="Node2D" parent="." unique_id=1097491018]
+position = Vector2(104.99997, -2261)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D121" type="Node2D" parent="." unique_id=769303532]
+position = Vector2(127, -2277)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D122" type="Node2D" parent="." unique_id=951589148]
+position = Vector2(131, -2251)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D123" type="Node2D" parent="." unique_id=972788378]
+position = Vector2(156.00003, -2271)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D124" type="Node2D" parent="." unique_id=92128260]
+position = Vector2(176, -2234)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D125" type="Node2D" parent="." unique_id=1666659186]
+position = Vector2(195.99994, -2267)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D126" type="Node2D" parent="." unique_id=1249271803]
+position = Vector2(210.99997, -2232)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D127" type="Node2D" parent="." unique_id=236005401]
+position = Vector2(230.99994, -2261.9998)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D128" type="Node2D" parent="." unique_id=170878193]
+position = Vector2(260.99997, -2225)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D129" type="Node2D" parent="." unique_id=1480474093]
+position = Vector2(282.00006, -2262.0002)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D130" type="Node2D" parent="." unique_id=106188357]
+position = Vector2(306.99997, -2224)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D131" type="Node2D" parent="." unique_id=1552504763]
+position = Vector2(321.99997, -2261)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D114" type="Node2D" parent="." unique_id=1578396687]
+position = Vector2(579, -2080)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D117" type="Node2D" parent="." unique_id=1399489264]
+position = Vector2(583.00006, -2055)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D113" type="Node2D" parent="." unique_id=771585157]
+position = Vector2(559, -2156)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D108" type="Node2D" parent="." unique_id=904258273]
+position = Vector2(590, -2221.0002)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D109" type="Node2D" parent="." unique_id=842172532]
+position = Vector2(558.00006, -2232.0002)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D112" type="Node2D" parent="." unique_id=2011854801]
+position = Vector2(574.00006, -2130)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D116" type="Node2D" parent="." unique_id=613206393]
+position = Vector2(555, -2060.9998)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D115" type="Node2D" parent="." unique_id=855279990]
+position = Vector2(552, -2098.9998)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D110" type="Node2D" parent="." unique_id=716863593]
+position = Vector2(597, -2268)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D111" type="Node2D" parent="." unique_id=1729696128]
+position = Vector2(561, -2202)
+rotation = -2.8843405
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D101" type="Node2D" parent="." unique_id=919679786]
+position = Vector2(530, -1809)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D96" type="Node2D" parent="." unique_id=1771732387]
+position = Vector2(595, -1821)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D97" type="Node2D" parent="." unique_id=1699909934]
+position = Vector2(685, -1825)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D102" type="Node2D" parent="." unique_id=1686374528]
+position = Vector2(721.9999, -1810.0001)
+rotation = -2.3848896
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D98" type="Node2D" parent="." unique_id=828025565]
+position = Vector2(642, -1843)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D99" type="Node2D" parent="." unique_id=1174849537]
+position = Vector2(727, -1847)
+script = ExtResource("8_f482d")
+count = 8
+spread = 20.0
+
+[node name="Node2D103" type="Node2D" parent="." unique_id=2119849590]
+position = Vector2(818, -1500)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D50" type="Node2D" parent="." unique_id=522521022]
-position = Vector2(3802, -1693)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D17" type="Node2D" parent="." unique_id=1343716777]
-position = Vector2(3755, -1879)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D18" type="Node2D" parent="." unique_id=245450796]
-position = Vector2(3685, -1810)
-script = ExtResource("8_f482d")
-count = 8
-spread = 20.0
-
-[node name="Node2D19" type="Node2D" parent="." unique_id=1105337731]
-position = Vector2(3755, -1728)
+position = Vector2(3124, -1873)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
 
 [node name="Node2D20" type="Node2D" parent="." unique_id=173521530]
-position = Vector2(3685, -1646)
+position = Vector2(3075, -1769)
 script = ExtResource("8_f482d")
 count = 8
 spread = 20.0
@@ -1370,3 +1697,540 @@ metadata/_edit_lock_ = true
 [node name="Polygon2D2" type="Polygon2D" parent="." unique_id=1474181542]
 color = Color(0.7490196, 0.73333335, 0.72156864, 1)
 polygon = PackedVector2Array(-1687, -4348, 6794, -4383, 6840, 1712, -1640, 1724, -1612, 771, 5398, 665, 5281, -3383, -174, -3336, -196, 744, -2292, 1061, -2257, -4325, -2257, -4325)
+
+[node name="Node2D6" type="Node2D" parent="." unique_id=1525102858]
+z_index = 4
+position = Vector2(-32, 554)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 256)
+
+[node name="Node2D32" type="Node2D" parent="." unique_id=1885977908]
+z_index = 4
+position = Vector2(220, 485)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D33" type="Node2D" parent="." unique_id=1013765708]
+z_index = 4
+position = Vector2(-230, 372)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D34" type="Node2D" parent="." unique_id=1184005913]
+z_index = 4
+position = Vector2(247, 25)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D166" type="Node2D" parent="." unique_id=233241587]
+z_index = 4
+position = Vector2(1704, -983)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D167" type="Node2D" parent="." unique_id=1509403761]
+z_index = 4
+position = Vector2(1913, -978)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D168" type="Node2D" parent="." unique_id=1665189611]
+z_index = 4
+position = Vector2(2019, -868)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D169" type="Node2D" parent="." unique_id=767451938]
+z_index = 4
+position = Vector2(2242, -673)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D170" type="Node2D" parent="." unique_id=1072561130]
+z_index = 4
+position = Vector2(2463, -699)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D171" type="Node2D" parent="." unique_id=1084892891]
+z_index = 4
+position = Vector2(2276, -642)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D172" type="Node2D" parent="." unique_id=1122172421]
+z_index = 4
+position = Vector2(2451, -635)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D173" type="Node2D" parent="." unique_id=1728411482]
+z_index = 4
+position = Vector2(2774, -312)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D174" type="Node2D" parent="." unique_id=860206570]
+z_index = 4
+position = Vector2(2577, -305)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D197" type="Node2D" parent="." unique_id=1761028871]
+z_index = 4
+position = Vector2(2589, -99)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D198" type="Node2D" parent="." unique_id=401630412]
+z_index = 4
+position = Vector2(2791, -101)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D175" type="Node2D" parent="." unique_id=1943037690]
+z_index = 4
+position = Vector2(2522, -474)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D35" type="Node2D" parent="." unique_id=1903215287]
+z_index = 4
+position = Vector2(247, -52)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D38" type="Node2D" parent="." unique_id=692852506]
+z_index = 4
+position = Vector2(476, -56)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D49" type="Node2D" parent="." unique_id=985145477]
+z_index = 4
+position = Vector2(569, -98)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D140" type="Node2D" parent="." unique_id=1317917957]
+z_index = 4
+position = Vector2(1022, -576)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D141" type="Node2D" parent="." unique_id=998488287]
+z_index = 4
+position = Vector2(1025, -490)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D142" type="Node2D" parent="." unique_id=577503005]
+z_index = 4
+position = Vector2(1281, -493)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D143" type="Node2D" parent="." unique_id=565366799]
+z_index = 4
+position = Vector2(1169, -94)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D144" type="Node2D" parent="." unique_id=1320252964]
+z_index = 4
+position = Vector2(55, -1309)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D145" type="Node2D" parent="." unique_id=1432920698]
+z_index = 4
+position = Vector2(103, -1415)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D146" type="Node2D" parent="." unique_id=1472205639]
+z_index = 4
+position = Vector2(100, -1316)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D147" type="Node2D" parent="." unique_id=1013682793]
+z_index = 4
+position = Vector2(589, -1281)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D148" type="Node2D" parent="." unique_id=1472398229]
+z_index = 4
+position = Vector2(581, -1382)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D149" type="Node2D" parent="." unique_id=1464087521]
+z_index = 4
+position = Vector2(796, -1260)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D150" type="Node2D" parent="." unique_id=645818287]
+z_index = 4
+position = Vector2(796, -1260)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D211" type="Node2D" parent="." unique_id=773615488]
+z_index = 4
+position = Vector2(1537, -2746)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D151" type="Node2D" parent="." unique_id=1361339502]
+z_index = 4
+position = Vector2(775, -1723)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D152" type="Node2D" parent="." unique_id=638271014]
+z_index = 4
+position = Vector2(835, -1593)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D153" type="Node2D" parent="." unique_id=90178843]
+z_index = 4
+position = Vector2(842, -1484)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D154" type="Node2D" parent="." unique_id=1554008297]
+z_index = 4
+position = Vector2(688, -2116)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D155" type="Node2D" parent="." unique_id=1490288177]
+z_index = 4
+position = Vector2(532, -2065)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D156" type="Node2D" parent="." unique_id=197567038]
+z_index = 4
+position = Vector2(385, -2062)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D157" type="Node2D" parent="." unique_id=926050315]
+z_index = 4
+position = Vector2(215, -2151)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D158" type="Node2D" parent="." unique_id=1504420107]
+z_index = 4
+position = Vector2(168, -2360)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D159" type="Node2D" parent="." unique_id=1430128530]
+z_index = 4
+position = Vector2(217, -2358)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D160" type="Node2D" parent="." unique_id=836670986]
+z_index = 4
+position = Vector2(694, -2332)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D161" type="Node2D" parent="." unique_id=1709330185]
+z_index = 4
+position = Vector2(927, -2330)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D162" type="Node2D" parent="." unique_id=1228911620]
+z_index = 4
+position = Vector2(977, -2169)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D163" type="Node2D" parent="." unique_id=1846236843]
+z_index = 4
+position = Vector2(2181, -1311)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D195" type="Node2D" parent="." unique_id=1042440611]
+z_index = 4
+position = Vector2(1726, 188)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D196" type="Node2D" parent="." unique_id=605048519]
+z_index = 4
+position = Vector2(2339, 208)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D204" type="Node2D" parent="." unique_id=576754858]
+z_index = 4
+position = Vector2(4769, -89)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D205" type="Node2D" parent="." unique_id=1188839049]
+z_index = 4
+position = Vector2(4068, -69)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D206" type="Node2D" parent="." unique_id=1902709558]
+z_index = 4
+position = Vector2(4037, -1386)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D191" type="Node2D" parent="." unique_id=703596821]
+z_index = 4
+position = Vector2(2881, -1290)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D201" type="Node2D" parent="." unique_id=165638241]
+z_index = 4
+position = Vector2(2887, -844)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D164" type="Node2D" parent="." unique_id=798976805]
+z_index = 4
+position = Vector2(2172, -1048)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D165" type="Node2D" parent="." unique_id=1697766704]
+z_index = 4
+position = Vector2(1575, -846)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(500, 150)
+
+[node name="Node2D132" type="Node2D" parent="." unique_id=1650959082]
+z_index = 4
+position = Vector2(729, 151)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D133" type="Node2D" parent="." unique_id=1282501485]
+z_index = 4
+position = Vector2(748, 183)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D134" type="Node2D" parent="." unique_id=1077841468]
+z_index = 4
+position = Vector2(979, 178)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D135" type="Node2D" parent="." unique_id=875358855]
+z_index = 4
+position = Vector2(1056, 302)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D136" type="Node2D" parent="." unique_id=2117874878]
+z_index = 4
+position = Vector2(71, 108)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
+[node name="Node2D137" type="Node2D" parent="." unique_id=702901266]
+z_index = 4
+position = Vector2(611, -191)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(1200, 203.74)
+
+[node name="Node2D176" type="Node2D" parent="." unique_id=1310633458]
+z_index = 4
+position = Vector2(2059, 472)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(1200, 203.74)
+
+[node name="Node2D177" type="Node2D" parent="." unique_id=1327853899]
+z_index = 4
+position = Vector2(4405, 109)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(1200, 203.74)
+
+[node name="Node2D178" type="Node2D" parent="." unique_id=354943350]
+z_index = 4
+position = Vector2(1543, -1889)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(800, 203.74)
+
+[node name="Node2D179" type="Node2D" parent="." unique_id=1063232048]
+z_index = 4
+position = Vector2(1748, -1883)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(800, 203.74)
+
+[node name="Node2D189" type="Node2D" parent="." unique_id=1947554195]
+z_index = 4
+position = Vector2(2514, -2290)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(800, 203.74)
+
+[node name="Node2D199" type="Node2D" parent="." unique_id=1319696334]
+z_index = 4
+position = Vector2(3272, -919)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(800, 203.74)
+
+[node name="Node2D200" type="Node2D" parent="." unique_id=1627210589]
+z_index = 4
+position = Vector2(3331, -1107)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(800, 203.74)
+
+[node name="Node2D190" type="Node2D" parent="." unique_id=1535587581]
+z_index = 4
+position = Vector2(2844, -2102)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D192" type="Node2D" parent="." unique_id=2056020778]
+z_index = 4
+position = Vector2(2896, -1516)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D193" type="Node2D" parent="." unique_id=1975811445]
+z_index = 4
+position = Vector2(3800, -1562)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D208" type="Node2D" parent="." unique_id=1310034573]
+z_index = 4
+position = Vector2(4493, -2225)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D209" type="Node2D" parent="." unique_id=2079394310]
+z_index = 4
+position = Vector2(4712, -2232)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D202" type="Node2D" parent="." unique_id=234337273]
+z_index = 4
+position = Vector2(3456, -484)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D203" type="Node2D" parent="." unique_id=680314812]
+z_index = 4
+position = Vector2(3459, -406)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D194" type="Node2D" parent="." unique_id=344238499]
+z_index = 4
+position = Vector2(3904, -1217)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D180" type="Node2D" parent="." unique_id=720124793]
+z_index = 4
+position = Vector2(596, -2555)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(800, 203.74)
+
+[node name="Node2D181" type="Node2D" parent="." unique_id=277505067]
+z_index = 4
+position = Vector2(1432, -2555)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(400, 203.74)
+
+[node name="Node2D182" type="Node2D" parent="." unique_id=1256769193]
+z_index = 4
+position = Vector2(969, -2694)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D183" type="Node2D" parent="." unique_id=1264350290]
+z_index = 4
+position = Vector2(257, -2699)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D184" type="Node2D" parent="." unique_id=2115083232]
+z_index = 4
+position = Vector2(1295, -2379)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D185" type="Node2D" parent="." unique_id=1190504250]
+z_index = 4
+position = Vector2(1293, -2191)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D186" type="Node2D" parent="." unique_id=1667816747]
+z_index = 4
+position = Vector2(1289, -2053)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D187" type="Node2D" parent="." unique_id=1308596679]
+z_index = 4
+position = Vector2(2137, -2403)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D188" type="Node2D" parent="." unique_id=1468292772]
+z_index = 4
+position = Vector2(2145, -2277)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D210" type="Node2D" parent="." unique_id=723417460]
+z_index = 4
+position = Vector2(1573, -2709)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(100, 203.74)
+
+[node name="Node2D138" type="Node2D" parent="." unique_id=996570560]
+z_index = 4
+position = Vector2(-163, -1039)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(1200, 203.74)
+
+[node name="Node2D207" type="Node2D" parent="." unique_id=1933734161]
+z_index = 4
+position = Vector2(4803, -1667)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(1200, 203.74)
+
+[node name="Node2D139" type="Node2D" parent="." unique_id=687124173]
+z_index = 4
+position = Vector2(1002, -1214)
+rotation = 1.5707964
+script = ExtResource("11_ro0ym")
+region_size = Vector2(1200, 203.74)

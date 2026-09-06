@@ -2,7 +2,7 @@ extends CharacterBody2D
 ## A glue ball. State machine on top of a CharacterBody2D so a resting ball is
 ## just a non-moving body the player can stand on. Flying balls move
 ## manually with move_and_collide and read the collided body's layer:
-##   wall_smooth -> reflect along the surface and keep flying
+##   wall_smooth or a wall contact inside GlueNoStickZone -> reflect and fly
 ##   anything else (rough wall or another glue ball) -> come to rest
 ## A resting ball elastically swells (visual + collision) after a short delay
 ## unless it is being collected.
@@ -16,6 +16,7 @@ const LAYER_SMOOTH := 2
 const LAYER_GLUE_REST := 4
 const LAYER_GLUE_FLY := 8
 const LAYER_PLAYER := 16
+const NO_STICK_ZONE = preload("res://scripts/gameplay/glue_no_stick_zone.gd")
 
 @onready var _blob: BlobSprite = $Visual/GlueBody
 @onready var _colshape: CollisionShape2D = $Collision
@@ -157,8 +158,14 @@ func _physics_fly(delta: float) -> void:
 	var col := move_and_collide(motion)
 	if col:
 		var collider := col.get_collider()
-		if collider is CollisionObject2D and (collider.collision_layer & LAYER_SMOOTH) != 0:
-			# Smooth wall: reflect the velocity and keep going (with a small push-out)
+		var reflects := false
+		if collider is CollisionObject2D:
+			reflects = (collider.collision_layer & LAYER_SMOOTH) != 0
+			if not reflects and (collider.collision_layer & LAYER_ROUGH) != 0:
+				# Test the wall contact, not the ball centre or the entire wall.
+				reflects = NO_STICK_ZONE.blocks_wall_contact(self, col.get_position())
+		if reflects:
+			# Smooth/non-stick wall: reflect and keep going with a small push-out.
 			fly_velocity = fly_velocity.bounce(col.get_normal())
 			global_position += col.get_normal() * 0.5
 		else:
