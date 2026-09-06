@@ -47,13 +47,14 @@ func _initialize() -> void:
 	var level := player_scene.instantiate()
 	root.add_child(level)
 	await process_frame
-	# The level starts with resting glue mounds. Under the tuned 0.2s swell
-	# delay they grow to double size almost immediately and block the scripted
-	# movement/jump corridor, so clear them before the input probes.
-	for n in get_nodes_in_group("glue_ball"):
-		if n.get("state") == 1 and is_instance_valid(n):
-			n.queue_free()
-	await _wait_physics_frames(2)
+	# The level starts with hundreds of editor-placed glue spots. Their balls
+	# materialise gradually over the first second, so clear every spot right
+	# away (releasing whatever already spawned and cancelling the queued rest)
+	# to keep the scripted movement/jump corridor clear.
+	for spot in get_nodes_in_group("glue_spot"):
+		spot.call("clear_pile")
+	await _wait_physics_frames(30)
+	_assert(_glue_pool.get_pending_pile_count() == 0, "clearing glue spots cancels their queued spawns")
 	var player := level.get_node_or_null("Player")
 	_assert(player != null, "player exists in player test")
 	var grow_to := clampi(_tuning.start_glue * 3, _tuning.start_glue + 1, _tuning.max_glue)
@@ -63,6 +64,7 @@ func _initialize() -> void:
 	_assert(player.get("collision_layer") == 16, "player uses collision layer 16")
 	var sprite := player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 	_assert(sprite != null and sprite.sprite_frames == character_frames, "player uses the character animation resource")
+	var body_frames := sprite.sprite_frames
 	var face_sprite := player.get_node_or_null("FaceSprite") as AnimatedSprite2D
 	var collection := player.get_node_or_null("VisualBlob") as BlobBackdrop
 	_assert(collection != null, "player has a liquid collection visual")
@@ -173,6 +175,7 @@ func _initialize() -> void:
 	var paint_scene := load("res://scenes/levels/paint_lab.tscn") as PackedScene
 	var paint_level := paint_scene.instantiate()
 	root.add_child(paint_level)
+	var busy_before_paint: int = _glue_pool.get_busy_count()
 	await process_frame
 	var shelf := paint_level.get_node_or_null("ShelfSmooth")
 	var block := paint_level.get_node_or_null("BlockRough")
@@ -190,8 +193,26 @@ func _initialize() -> void:
 		spot.count = 4
 		paint_level.add_child(spot)
 	await process_frame
-	_assert(spot.call("get_spawned_count") == 4, "glue spot spawns configured resting particles")
+	var spot_ready := false
+	for _i in 150:
+		if spot.call("get_spawned_count") == 4:
+			spot_ready = true
+			break
+		await _wait_physics_frames(1)
+	_assert(spot_ready, "glue spot spawns its configured resting particles within the first second")
+	_assert(_glue_pool.get_busy_count() == busy_before_paint + 4, "glue spot particles are real pooled resting balls")
+	var pile_balls_ok := true
+	var pile_ball_count := 0
+	for n in get_nodes_in_group("glue_ball"):
+		if n.get("state") == 1 and is_instance_valid(n) and _glue_pool.get_busy_list().has(n):
+			pile_ball_count += 1
+			var pile_col := n.get_node_or_null("Collision") as CollisionShape2D
+			if pile_col == null or pile_col.disabled or n.get("collision_layer") != 4:
+				pile_balls_ok = false
+	_assert(pile_ball_count == 4 and pile_balls_ok, "every glue spot particle keeps its own enabled resting collision")
 	spot.call("clear_pile")
+	await _wait_physics_frames(2)
+	_assert(spot.call("get_spawned_count") == 0 and _glue_pool.get_busy_count() == busy_before_paint, "clearing a glue spot releases its particles back to the pool")
 	paint_level.free()
 	await _wait_physics_frames(2)
 	# The spawn pocket has a low ceiling that wedges the grown player in place,
@@ -213,8 +234,13 @@ func _initialize() -> void:
 	Input.action_press("jump")
 	await _wait_until_animation(sprite, &"jump", 8)
 	_assert(sprite.animation == &"jump", "jump input activates jump animation")
+	await _wait_physics_frames(28)
+	var jump_last := body_frames.get_frame_count("jump") - 1
+	_assert(not player.is_on_floor() and sprite.animation == &"jump" and not sprite.is_playing() and sprite.frame == jump_last, "jump animation plays once and holds its last frame in the air")
+	if face_sprite != null:
+		_assert(face_sprite.animation == &"jump" and not face_sprite.is_playing() and face_sprite.frame == jump_last, "face jump animation holds its last frame in the air")
 	Input.action_release("jump")
-	await _wait_physics_frames(24)
+	await _wait_physics_frames(50)
 
 	var busy_before_spit: int = _glue_pool.get_busy_count()
 	Input.action_press("spit_glue")
@@ -227,7 +253,6 @@ func _initialize() -> void:
 	_assert(_glue_pool.get_busy_count() >= busy_after_spit + 1, "holding spit emits additional single glue balls")
 	_assert(player.get("glue_count") <= grow_to - 2, "continuous spit spends one particle per interval")
 	await _wait_physics_frames(18)
-	var body_frames := sprite.sprite_frames
 	var spit_last := body_frames.get_frame_count("spit") - 1
 	_assert(sprite.animation == &"spit" and not sprite.is_playing() and sprite.frame == spit_last, "spit animation plays once and holds its last frame while held")
 	if face_sprite != null:
@@ -253,6 +278,132 @@ func _initialize() -> void:
 		await _wait_physics_frames(8)
 		_assert(not _glue_pool.get_busy_list().has(suck_ball) and player.get("glue_count") == glue_before_suck + 1, "sucked glue ball reaches and is collected by player")
 
+	var trio: Array[Node] = []
+	# Give the player exactly three free slots so the fill-up behaviour can be
+	# asserted precisely, and clear every leftover resting ball first so the
+	# trio are the only candidates in the cone.
+	player.set_glue_count(_tuning.max_glue - 3)
+	_release_resting_pool_balls()
+	await _wait_physics_frames(2)
+	# Pre-press for one frame so the player re-aims at the mouse; balls are then
+	# placed along that aim so the cone always covers them.
+	player.set("_aim_dir", Vector2.RIGHT)
+	Input.action_press("suck_glue")
+	await _wait_physics_frames(1)
+	Input.action_release("suck_glue")
+	var aim_dir: Vector2 = player.get("_aim_dir")
+	for i in 3:
+		var b: Node = _glue_pool.take_ball()
+		if b == null:
+			break
+		trio.append(b)
+		b.global_position = player.global_position + aim_dir * (70.0 + i * 90.0)
+		b.call("place_at_rest")
+	await _wait_physics_frames(2)
+	if trio.size() == 3:
+		Input.action_press("suck_glue")
+		await _wait_physics_frames(2)
+		Input.action_release("suck_glue")
+		var all_grabbed := true
+		for b in trio:
+			all_grabbed = all_grabbed and b.get("state") == 2
+		_assert(all_grabbed, "every in-range glue ball is grabbed while slots are free")
+		await _wait_physics_frames(28)
+		var all_collected := true
+		for b in trio:
+			all_collected = all_collected and not _glue_pool.get_busy_list().has(b)
+		_assert(all_collected, "grabbed glue balls fly straight to the player and get collected")
+		_assert(player.get("glue_count") == _tuning.max_glue, "glue balls fill the player exactly up to max")
+
+	# Waste-prevention regression: with only one free slot and several balls in
+	# range, only the nearest ball is locked; the rest stay resting and are
+	# never pulled in afterwards, because the committed total (on-body glue +
+	# flying balls), not the on-body count alone, decides when to stop.
+	player.set_glue_count(_tuning.max_glue - 1)
+	_release_resting_pool_balls()
+	await _wait_physics_frames(2)
+	player.set("_aim_dir", Vector2.RIGHT)
+	Input.action_press("suck_glue")
+	await _wait_physics_frames(1)
+	Input.action_release("suck_glue")
+	await _wait_physics_frames(1)
+	var waste_aim: Vector2 = player.get("_aim_dir")
+	var rest_balls: Array[Node] = []
+	for i in 4:
+		var b: Node = _glue_pool.take_ball()
+		if b == null:
+			break
+		rest_balls.append(b)
+		b.global_position = player.global_position + waste_aim * (70.0 + i * 60.0)
+		b.call("place_at_rest")
+	await _wait_physics_frames(2)
+	if rest_balls.size() == 4:
+		Input.action_press("suck_glue")
+		await _wait_physics_frames(3)
+		Input.action_release("suck_glue")
+		var locked := 0
+		for b in rest_balls:
+			if b.get("state") == 2:
+				locked += 1
+		_assert(locked == 1, "with one free slot only the nearest glue ball is locked")
+		await _wait_physics_frames(30)
+		var leftovers := 0
+		for b in rest_balls:
+			if b.get("state") == 1 and _glue_pool.get_busy_list().has(b):
+				leftovers += 1
+		_assert(leftovers == 3, "locked ball is collected and the rest are never sucked")
+		_assert(player.get("glue_count") == _tuning.max_glue, "player reaches max without wasting in-flight glue balls")
+
+	player.set("_aim_dir", Vector2.RIGHT)
+	Input.action_press("suck_glue")
+	await _wait_physics_frames(1)
+	Input.action_release("suck_glue")
+	await _wait_physics_frames(1)
+
+	var obstacle_wall := StaticBody2D.new()
+	obstacle_wall.collision_layer = 1
+	var obstacle_shape := CollisionShape2D.new()
+	var obstacle_rect := RectangleShape2D.new()
+	obstacle_rect.size = Vector2(8.0, 120.0)
+	obstacle_shape.shape = obstacle_rect
+	var obstacle_aim: Vector2 = player.get("_aim_dir")
+	obstacle_wall.position = player.global_position + obstacle_aim * 150.0
+	obstacle_wall.rotation = obstacle_aim.angle()
+	obstacle_wall.add_child(obstacle_shape)
+	level.add_child(obstacle_wall)
+	var blocker_ball: Node = _glue_pool.take_ball()
+	var wall_ball: Node = _glue_pool.take_ball()
+	var original_max_suck_glue: int = _tuning.max_suck_glue
+	if blocker_ball != null and wall_ball != null:
+		# Keep the collar below max so the full-cap check doesn't swallow this
+		# obstacle scenario (continuous sucking above fills the player).
+		player.set_glue_count(4)
+		await _wait_physics_frames(2)
+		blocker_ball.global_position = player.global_position + obstacle_aim * 205.0
+		wall_ball.global_position = player.global_position + obstacle_aim * 300.0
+		blocker_ball.call("place_at_rest")
+		wall_ball.call("place_at_rest")
+		await _wait_physics_frames(2)
+		# Earlier spit probes leave resting balls in the scene. Give this isolated
+		# obstacle check enough scan capacity to reach both target balls.
+		_tuning.max_suck_glue = 200
+		Input.action_press("suck_glue")
+		await _wait_physics_frames(2)
+		Input.action_release("suck_glue")
+		_assert(blocker_ball.get("state") == 2 and wall_ball.get("state") == 2, "suck locks both a blocking ball and a ball behind a wall")
+		var blocker_collision := blocker_ball.get_node_or_null("Collision") as CollisionShape2D
+		var wall_ball_collision := wall_ball.get_node_or_null("Collision") as CollisionShape2D
+		_assert(blocker_ball.collision_layer == 0 and blocker_ball.collision_mask == 0 and wall_ball.collision_layer == 0 and wall_ball.collision_mask == 0, "sucked balls ignore collision even when obstacles are between them and the player")
+		_assert(blocker_collision != null and blocker_collision.disabled and wall_ball_collision != null and wall_ball_collision.disabled, "sucked balls disable their shapes while flying through obstacles")
+		await _wait_physics_frames(30)
+		_assert(not _glue_pool.get_busy_list().has(blocker_ball) and not _glue_pool.get_busy_list().has(wall_ball), "balls behind collision obstacles still reach and get collected")
+	_tuning.max_suck_glue = original_max_suck_glue
+	obstacle_wall.free()
+
+	# Room to observe the suck animation: drain below max first.
+	if player.get("glue_count") >= _tuning.max_glue:
+		player.set_glue_count(maxi(_tuning.max_glue - 2, 0))
+		await _wait_physics_frames(2)
 	Input.action_press("suck_glue")
 	await _wait_physics_frames(1)
 	_assert(sprite.animation == &"suck", "suck input activates suck animation")
@@ -263,6 +414,28 @@ func _initialize() -> void:
 		_assert(face_sprite.animation == &"suck" and not face_sprite.is_playing() and face_sprite.frame == suck_last, "face suck animation plays once and holds its last frame while held")
 	Input.action_release("suck_glue")
 	await _wait_physics_frames(1)
+
+	# At max glue sucking is fully inert: no ball enters SUCK, no glow, and the
+	# suck animation never starts.
+	player.set_glue_count(_tuning.max_glue)
+	await _wait_physics_frames(10)
+	var full_ball: Node = _glue_pool.take_ball()
+	if full_ball != null:
+		full_ball.global_position = player.global_position + Vector2(120.0, 0.0)
+		full_ball.call("place_at_rest")
+		await _wait_physics_frames(2)
+		player.set("_aim_dir", Vector2.RIGHT)
+		Input.action_press("suck_glue")
+		await _wait_physics_frames(3)
+		_assert(full_ball.get("state") != 2, "full player cannot start sucking a resting ball")
+		_assert(full_ball.collision_layer != 0, "full player leaves resting balls untouched")
+		_assert(sprite.animation != &"suck", "full player does not play the suck animation")
+		_assert(player.get("glue_count") == _tuning.max_glue, "full player glue count stays at max")
+		Input.action_release("suck_glue")
+		await _wait_physics_frames(1)
+		_glue_pool.release_ball(full_ball)
+	player.set_glue_count(clampi(_tuning.start_glue, 0, _tuning.max_glue))
+	await _wait_physics_frames(10)
 
 	_assert(level.get_node_or_null("LevelLogic") == null, "player test no longer auto-spawns glue")
 	_assert(load("res://scripts/gameplay/glue_spot.gd") != null, "manual glue spot component stays available")
@@ -287,6 +460,13 @@ func _assert(condition: bool, label: String) -> void:
 func _wait_physics_frames(count: int) -> void:
 	for _frame in count:
 		await physics_frame
+
+
+func _release_resting_pool_balls() -> void:
+	var busy: Array[Node] = _glue_pool.get_busy_list()
+	for n in get_nodes_in_group("glue_ball"):
+		if is_instance_valid(n) and n.get("state") == 1 and busy.has(n):
+			_glue_pool.release_ball(n)
 
 
 func _wait_until_animation(sprite: AnimatedSprite2D, expected: StringName, max_frames: int) -> void:

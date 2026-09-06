@@ -30,7 +30,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var previous_radius := radius
 	radius = lerpf(radius, radius_target, minf(delta * 12.0, 1.0))
-	position.y = _bottom_y - radius
+	position.y = _bottom_y - _visual_radius()
 	if not is_equal_approx(previous_radius, radius):
 		_layout_dirty = true
 	if _layout_dirty:
@@ -53,7 +53,7 @@ func set_glue_count(count: int) -> void:
 
 func set_bottom_anchor(value: float) -> void:
 	_bottom_y = value
-	position.y = _bottom_y - radius
+	position.y = _bottom_y - _visual_radius()
 	if _is_ready:
 		_emit_layout()
 
@@ -65,7 +65,17 @@ func set_glue_color(value: Color) -> void:
 
 
 func get_collection_bottom_y() -> float:
-	return position.y + radius
+	return position.y + _visual_radius()
+
+
+func _visual_radius() -> float:
+	var glue_radius := _tuning_float("collection_bubble_radius", 6.0)
+	var pack := _tuning_float("collection_layout_pack", 0.6)
+	# The layout packs particle centres into (radius - glue_radius) * pack, so
+	# the visible disc edge sits one glue_radius beyond that. Anchoring by this
+	# visual radius keeps the cluster hugging the character at every size
+	# instead of drifting upward as the raw collection radius grows.
+	return maxf((radius - glue_radius) * maxf(pack, 0.01), 0.8) + glue_radius
 
 
 func get_particle_layout() -> Dictionary:
@@ -107,15 +117,16 @@ func _build_layout() -> Dictionary:
 
 	var glue_radius := _tuning_float("collection_bubble_radius", 6.0)
 	var glue_extent := maxf(collection_radius - glue_radius, 0.0)
+	var pack := _tuning_float("collection_layout_pack", 0.6)
 	for i in _glue_count:
 		var offset := Vector2.ZERO
 		if i == 0:
-			# This granule is the foot anchor. Its bottom is exactly the collection
-			# baseline, independent of how many other particles are carried.
-			offset = Vector2.DOWN * glue_extent
+			# This granule is the foot anchor. Its bottom is exactly the packed
+			# collection baseline, independent of how many particles are carried.
+			offset = Vector2.DOWN * glue_extent * pack
 		else:
 			var sample_count := maxi(_glue_count - 1, 1)
-			var radial := sqrt(float(i) / float(sample_count)) * glue_extent
+			var radial := sqrt(float(i) / float(sample_count)) * glue_extent * pack
 			var angle := float(i - 1) * GOLDEN_ANGLE
 			offset = Vector2.from_angle(angle) * radial
 		positions.append(offset)

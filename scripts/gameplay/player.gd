@@ -29,7 +29,6 @@ var _jump_buffer_timer := 0.0
 var _jump_hold_timer := 0.0
 var _was_airborne := true
 var _spit_cooldown_timer := 0.0
-var _suck_recast_timer := 0.0
 var _time := 0.0
 var _pending_suck: Array[Node] = []
 var _action_anim := &""
@@ -76,6 +75,7 @@ func set_glue_count(n: int) -> void:
 
 func add_glue_from_ball() -> void:
 	set_glue_count(glue_count + 1)
+	AudioManager.play_glue_up(float(glue_count) / float(GameTuning.max_glue))
 
 
 func notify_ball_collected(ball: Node) -> void:
@@ -88,8 +88,6 @@ func _physics_process(delta: float) -> void:
 
 	if _spit_cooldown_timer > 0.0:
 		_spit_cooldown_timer -= delta
-	if _suck_recast_timer > 0.0:
-		_suck_recast_timer -= delta
 
 	var wish := Input.get_axis("move_left", "move_right")
 	if wish != 0.0:
@@ -143,9 +141,13 @@ func _physics_process(delta: float) -> void:
 		_start_action_animation(&"spit")
 	if spit_down:
 		_spit()
-	if suck_down and not _suck_was_down:
+	# When the committed total (glue on the body + balls already flying back)
+	# reaches max the player is full: sucking is fully inert (no scan, no anim,
+	# no cone) until glue drops below max again.
+	var can_suck := _can_suck_more()
+	if can_suck and suck_down and not _suck_was_down:
 		_start_action_animation(&"suck")
-	if suck_down:
+	if can_suck and suck_down:
 		_try_suck()
 	if _spit_was_down and not spit_down and _action_anim == &"spit":
 		_action_anim = &""
@@ -169,6 +171,7 @@ func _do_jump() -> void:
 	var vy := GameTuning.jump_velocity * (1.0 - GameTuning.glue_jump_weight_max * weight)
 	velocity.y = vy
 	_jump_hold_timer = GameTuning.jump_hold_time
+	AudioManager.play_sfx_jump()
 	GameplayEvents.emit_glue_changed(glue_count, GameTuning.max_glue)  # no-op keeps signal warm
 
 
@@ -253,6 +256,7 @@ func _spit() -> void:
 	var dir := _aim_dir.rotated(randf_range(-half_spread, half_spread))
 	var muzzle := global_position + dir * (r + GameTuning.glue_ball_radius + 3.0)
 	ball.call("begin_fly", muzzle, dir, GameTuning.spit_speed)
+	AudioManager.play_sfx_shoot()
 
 
 func _current_radius() -> float:
@@ -260,10 +264,25 @@ func _current_radius() -> float:
 	return minf(collection_radius, GameTuning.player_collection_max_radius)
 
 
+func _suck_committed() -> int:
+	# "Committed" glue: what is already on the body plus every ball currently
+	# flying back to it. Sucking decisions use this total, not glue_count, so a
+	# full flight of balls can never be locked while older ones are still in
+	# the air (that used to over-commit and waste balls at the cap).
+	return glue_count + _pending_suck.size()
+
+
+func _can_suck_more() -> bool:
+	return _suck_committed() < GameTuning.max_glue
+
+
 func _try_suck() -> void:
-	if _suck_recast_timer > 0.0:
+	# Runs every physics frame while the button is held so a suck attempt can
+	# never come up empty: the scan has a generous cap and candidates are
+	# distance-sorted (nearest first) instead of relying on the broadphase's
+	# arbitrary order. Balls already flying to this player are skipped.
+	if not _can_suck_more():
 		return
-	_suck_recast_timer = GameTuning.suck_recast_time
 	var space := get_world_2d().direct_space_state
 	var q := PhysicsShapeQueryParameters2D.new()
 	var circ := CircleShape2D.new()
@@ -273,8 +292,10 @@ func _try_suck() -> void:
 	q.collision_mask = LAYER_GLUE_REST | LAYER_GLUE_FLY
 	q.collide_with_bodies = true
 	q.collide_with_areas = false
-	var results := space.intersect_shape(q, 48)
-	var owned: Array = []
+	var results := space.intersect_shape(q, 256)
+	var half_cos := cos(deg_to_rad(GameTuning.suck_cone_angle_deg * 0.5))
+	var range_max := GameTuning.suck_range + GameTuning.glue_ball_radius
+	var candidates: Array = []
 	for res in results:
 		var ball = res.get("collider")
 		if ball == null or not is_instance_valid(ball):
@@ -284,21 +305,24 @@ func _try_suck() -> void:
 		if ball.get("state") == 2 and ball.get("owner_player") == self:
 			continue
 		var rel: Vector2 = ball.global_position - global_position
-		if rel.length() > GameTuning.suck_range + GameTuning.glue_ball_radius:
+		if rel.length() > range_max:
 			continue
 		var dot: float = rel.normalized().dot(_aim_dir)
-		var half := cos(deg_to_rad(GameTuning.suck_cone_angle_deg * 0.5))
-		if dot < half:
+		if dot < half_cos:
 			continue
-		owned.append(ball)
-		if owned.size() >= GameTuning.max_suck_glue:
+		candidates.append({"ball": ball, "dist2": rel.length_squared()})
+	candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["dist2"] < b["dist2"])
+	var committed := _suck_committed()
+	for i in mini(candidates.size(), GameTuning.max_suck_glue):
+		if committed >= GameTuning.max_glue:
 			break
-	for b in owned:
-		b.begin_suck(self)
-		_pending_suck.append(b)
+		var ball: Node = candidates[i]["ball"]
+		ball.begin_suck(self)
+		_pending_suck.append(ball)
+		committed += 1
 
 func _draw() -> void:
-	if GameTuning.show_suck_range and Input.is_action_pressed("suck_glue"):
+	if GameTuning.show_suck_range and Input.is_action_pressed("suck_glue") and _can_suck_more():
 		_draw_suck_cone()
 
 
@@ -306,7 +330,7 @@ func _start_action_animation(animation_name: StringName) -> void:
 	# Action animations (spit/suck) are one-shot: they start once on the press
 	# edge and hold their last frame until the button is released.
 	_action_anim = animation_name
-	_play_body_animation(animation_name)
+	_play_body_animation(animation_name, true)
 
 
 func _update_animation() -> void:
@@ -324,21 +348,19 @@ func _update_animation() -> void:
 		_play_body_animation(&"idle")
 
 
-func _play_body_animation(animation_name: StringName) -> void:
+func _play_body_animation(animation_name: StringName, restart: bool = false) -> void:
 	if _animated_sprite == null or _animated_sprite.sprite_frames == null:
 		return
-	if _animated_sprite.animation == animation_name and _animated_sprite.is_playing():
-		return
-	_animated_sprite.play(animation_name)
-	_play_on_face(animation_name)
+	if restart or _animated_sprite.animation != animation_name:
+		_animated_sprite.play(animation_name)
+	_play_on_face(animation_name, restart)
 
 
-func _play_on_face(animation_name: StringName) -> void:
+func _play_on_face(animation_name: StringName, restart: bool = false) -> void:
 	if _face_sprite == null or _face_sprite.sprite_frames == null:
 		return
-	if _face_sprite.animation == animation_name and _face_sprite.is_playing():
-		return
-	_face_sprite.play(animation_name)
+	if restart or _face_sprite.animation != animation_name:
+		_face_sprite.play(animation_name)
 
 
 func _draw_suck_cone() -> void:

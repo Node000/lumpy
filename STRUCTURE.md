@@ -47,7 +47,11 @@ Prototype platformer and puzzle interaction loop. Player and glue balls are
 - `res://scripts/core/gameplay_events.gd`: cross-scene glue count signal.
 - `res://scripts/core/glue_pool.gd`: pooled glue ball instances.
 - `res://scripts/core/audio_manager.gd`: autoload; ensures `BGM`/`SFX` audio
-  buses exist and exposes bus-volume getters/setters for the settings menu.
+  buses exist, exposes bus-volume getters/setters for the settings menu, and
+  owns playback: one looping BGM player (`Audio/Digital Lemonade.mp3`) plus a
+  6-voice SFX pool (`Audio/jump.wav`, `shoot.wav`, `glueUP.ogg`). glueUP pitch
+  rises 0.9x->1.8x with the player's glue percentage; all gains/pitch live in
+  `GameTuning`'s `# Audio` section.
 - `res://scripts/ui/settings_menu.gd`: autoload; Esc opens/closes a pause
   menu with SFX/BGM volume sliders, a resume button, and a quit button.
   Pausing uses `SceneTree.paused`; the menu itself runs with
@@ -83,8 +87,12 @@ Layer 1 is rough wall, layer 2 is smooth wall, layer 3 is resting glue, layer
   horizontal/vertical pan, in-room lock, and far-teleport settling.
 - `tests/test_settings_menu.gd` validates audio bus creation, volume setters,
   the Esc pause toggle, and settings-menu slider/button layout.
+- `tests/test_audio_sfx.gd` validates the 6-voice SFX pool, bus routing, BGM
+  looping, and the glue-UP pitch mapping.
 - Windowed capture helper: `scripts/qa/visual_capture.gd` with user args
   `--scene=res://... --output=...`.
+- Loudness probe: `scripts/qa/measure_audio_loudness.gd` plays each file
+  through an `AudioEffectCapture` and prints duration / RMS / peak / gain.
 
 ## Asset Hints
 

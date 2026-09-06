@@ -1,13 +1,21 @@
 extends Node
 ## Pool of GlueBall scene instances. Autoload singleton "GluePool".
 ## Players pull balls with take_ball(), give them back with release_ball().
+##
+## Editor-placed glue spots (glue_spot.gd) do not materialise their particles
+## all at once on level load: they enqueue them here and _process() turns a
+## small batch per frame into real resting balls, so a level with hundreds of
+## placed glue particles finishes spawning within roughly the first second
+## instead of hitching the first frames.
 
 const BALL_SCENE := "res://scenes/gameplay/glue_ball.tscn"
 const POOL_LIMIT := 200
+const PILE_SPAWNS_PER_FRAME := 24  # ~1440 particles/second at 60 fps
 
 var _available: Array[Node] = []
 var _busy: Array[Node] = []
 var _ball_scene: PackedScene
+var _pending_piles: Array = []  # each entry: [spot: Node, world_pos: Vector2]
 
 
 func _ready() -> void:
@@ -17,6 +25,41 @@ func _ready() -> void:
 		return
 	for i in POOL_LIMIT:
 		_spawn_ball()
+
+
+func _process(_delta: float) -> void:
+	if _pending_piles.is_empty():
+		return
+	var batch := mini(PILE_SPAWNS_PER_FRAME, _pending_piles.size())
+	for i in batch:
+		_spawn_one_pile_ball()
+
+
+func request_pile_ball(spot: Node, world_pos: Vector2) -> void:
+	_pending_piles.append([spot, world_pos])
+
+
+func cancel_pile_requests(spot: Node) -> void:
+	for i in range(_pending_piles.size() - 1, -1, -1):
+		if _pending_piles[i][0] == spot:
+			_pending_piles.remove_at(i)
+
+
+func get_pending_pile_count() -> int:
+	return _pending_piles.size()
+
+
+func _spawn_one_pile_ball() -> void:
+	var entry: Array = _pending_piles.pop_front()
+	var spot: Node = entry[0]
+	if not is_instance_valid(spot):
+		return
+	var ball := take_ball()
+	if ball == null:
+		return
+	ball.global_position = entry[1]
+	ball.call("place_at_rest")
+	spot.call("register_pile_ball", ball)
 
 
 func _spawn_ball() -> Node:
