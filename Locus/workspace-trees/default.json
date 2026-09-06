@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "presetId": "default",
+  "name": "Default",
+  "projectId": "git-e158fbf06ee3de8905c887d0",
+  "revision": 2,
+  "lastOperationId": "327b5867-fa7e-4661-a98a-04b71da3bda0",
+  "nodes": [
+    {
+      "nodeId": "resource:system:1fdde474-c400-4609-9b36-9017cf874aab",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "system",
+      "resourceId": "newSession",
+      "hidden": false,
+      "position": 0
+    },
+    {
+      "nodeId": "resource:system:ece8d26c-abeb-46c8-baa1-c5ddcda8be7f",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "system",
+      "resourceId": "knowledge",
+      "hidden": false,
+      "position": 2
+    },
+    {
+      "nodeId": "resource:system:056f7e11-45fb-4659-a1e1-7b8bb686dac8",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "system",
+      "resourceId": "collaboration",
+      "hidden": false,
+      "position": 3
+    },
+    {
+      "nodeId": "resource:system:c9e544a5-0b67-4d6c-bcce-53d0c6e90579",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "system",
+      "resourceId": "assets",
+      "hidden": false,
+      "position": 4
+    },
+    {
+      "nodeId": "resource:system:4096eb30-1579-4134-84a1-b41ea999e106",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "system",
+      "resourceId": "views",
+      "hidden": false,
+      "position": 5
+    },
+    {
+      "nodeId": "resource:system:f7240609-c706-4217-b34e-2e34bf205fb7",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "system",
+      "resourceId": "archived",
+      "hidden": true,
+      "position": 6
+    },
+    {
+      "nodeId": "resource:session:47aba210-2216-4d31-9eae-9cbb80701536",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "session",
+      "resourceId": "f23e159f-cbd8-46f8-8935-6f82ed5fc8a8",
+      "hidden": false,
+      "position": 1
+    }
+  ]
+}
