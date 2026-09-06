@@ -18,6 +18,9 @@ radius = 18.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2blty"]
 size = Vector2(346.875, 36.034492)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a7rkt"]
+size = Vector2(73.4375, 9.568972)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bxw12"]
 size = Vector2(104.375, 9.206884)
 
@@ -243,6 +246,11 @@ scale = Vector2(1.6, 11.5999975)
 position = Vector2(269.6875, 29.482769)
 scale = Vector2(1, 1.0000001)
 shape = SubResource("RectangleShape2D_2blty")
+
+[node name="Shape43" type="CollisionShape2D" parent="Wall2" unique_id=595498785]
+position = Vector2(3008.9063, -185.81902)
+scale = Vector2(1, 1.0000001)
+shape = SubResource("RectangleShape2D_a7rkt")
 
 [node name="Shape40" type="CollisionShape2D" parent="Wall2" unique_id=880946538]
 position = Vector2(1219.0625, -219.5518)
@@ -1939,6 +1947,12 @@ position = Vector2(217, -2358)
 script = ExtResource("11_ro0ym")
 region_size = Vector2(257.07, 150)
 
+[node name="Node2D213" type="Node2D" parent="." unique_id=20259736]
+z_index = 4
+position = Vector2(-44, -2968)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(257.07, 150)
+
 [node name="Node2D160" type="Node2D" parent="." unique_id=836670986]
 z_index = 4
 position = Vector2(694, -2332)
@@ -2157,6 +2171,13 @@ region_size = Vector2(400, 203.74)
 [node name="Node2D180" type="Node2D" parent="." unique_id=720124793]
 z_index = 4
 position = Vector2(596, -2555)
+script = ExtResource("11_ro0ym")
+region_size = Vector2(800, 203.74)
+
+[node name="Node2D212" type="Node2D" parent="." unique_id=1847959789]
+z_index = 4
+position = Vector2(-198, -2562)
+rotation = 1.5707964
 script = ExtResource("11_ro0ym")
 region_size = Vector2(800, 203.74)
 

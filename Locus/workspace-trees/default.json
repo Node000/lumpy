@@ -3,8 +3,8 @@
   "presetId": "default",
   "name": "Default",
   "projectId": "git-e158fbf06ee3de8905c887d0",
-  "revision": 3,
-  "lastOperationId": "6bf5390b-9cce-4344-8ba0-7f76201fe8aa",
+  "revision": 4,
+  "lastOperationId": "f78e31f3-eb47-44c3-a9fe-80c0d7975aa3",
   "nodes": [
     {
       "nodeId": "resource:system:1fdde474-c400-4609-9b36-9017cf874aab",
@@ -22,7 +22,7 @@
       "resourceKind": "system",
       "resourceId": "knowledge",
       "hidden": false,
-      "position": 3
+      "position": 4
     },
     {
       "nodeId": "resource:system:056f7e11-45fb-4659-a1e1-7b8bb686dac8",
@@ -31,7 +31,7 @@
       "resourceKind": "system",
       "resourceId": "collaboration",
       "hidden": false,
-      "position": 4
+      "position": 5
     },
     {
       "nodeId": "resource:system:c9e544a5-0b67-4d6c-bcce-53d0c6e90579",
@@ -40,7 +40,7 @@
       "resourceKind": "system",
       "resourceId": "assets",
       "hidden": false,
-      "position": 5
+      "position": 6
     },
     {
       "nodeId": "resource:system:4096eb30-1579-4134-84a1-b41ea999e106",
@@ -49,7 +49,7 @@
       "resourceKind": "system",
       "resourceId": "views",
       "hidden": false,
-      "position": 6
+      "position": 7
     },
     {
       "nodeId": "resource:system:f7240609-c706-4217-b34e-2e34bf205fb7",
@@ -58,7 +58,7 @@
       "resourceKind": "system",
       "resourceId": "archived",
       "hidden": true,
-      "position": 7
+      "position": 8
     },
     {
       "nodeId": "resource:session:47aba210-2216-4d31-9eae-9cbb80701536",
@@ -67,7 +67,7 @@
       "resourceKind": "session",
       "resourceId": "f23e159f-cbd8-46f8-8935-6f82ed5fc8a8",
       "hidden": false,
-      "position": 2
+      "position": 3
     },
     {
       "nodeId": "resource:session:20837d7e-342e-4acf-b1ad-5632619b6da7",
@@ -75,6 +75,15 @@
       "nodeKind": "resource",
       "resourceKind": "session",
       "resourceId": "86c22420-a4e4-4080-aae9-89aada1f91b5",
+      "hidden": false,
+      "position": 2
+    },
+    {
+      "nodeId": "resource:session:bfbb831d-11dc-415b-9465-33623d7632ba",
+      "projectId": "git-e158fbf06ee3de8905c887d0",
+      "nodeKind": "resource",
+      "resourceKind": "session",
+      "resourceId": "3d266b34-b898-486c-ad34-0e42c5d87435",
       "hidden": false,
       "position": 1
     }
